@@ -178,7 +178,29 @@ class EthNamespaceCore:
         params = [block_hash]
         return generate_json_rpc(method, params, request_id=request_id)
 
+    @staticmethod
+    def get_eth_get_block_by_number_body(block_number: Union[int, str], request_id: int=1):
+        method = "eth_getBlockByNumber"
+        params = [hex(block_number) if isinstance(block_number, int) else block_number]
+        return generate_json_rpc(method, params, request_id=request_id)
 
+    @staticmethod
+    def get_eth_get_transaction_by_hash_body(transaction_hash: str, request_id: int=1):
+        method = "eth_getTransactionByHash"
+        params = [transaction_hash]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_transaction_by_block_hash_and_index_body(block_hash: str, idx: int, request_id: int=1):
+        method = "eth_getTransactionByBlockHashAndIndex"
+        params = [block_hash, idx]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_transaction_by_block_number_and_index_body(block_number: Union[int, str], idx: int, request_id: int=1):
+        method = "eth_getTransactionByBlockNumberAndIndex"
+        params = [hex(block_number) if isinstance(block_number, int) else block_number, idx]
+        return generate_json_rpc(method, params, request_id=request_id)
 
 
 

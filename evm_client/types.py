@@ -4,12 +4,12 @@ class Transaction:
 
     def __init__(
             self, 
-            from_: str, 
+            from_: str,
+            input_: str,
             to: Optional[str]=None, 
             gas: Optional[int]=None, 
             gas_price: Optional[int]=None, 
             value: Optional[int]=None, 
-            input_: str,
             nonce: Optional[int]=None
     ):
         self.from_ = from_

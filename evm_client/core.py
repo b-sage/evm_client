@@ -1,4 +1,5 @@
-from typing import List, Union
+from typing import List, Union, Optional
+from evm_client.types import Transaction
 
 def generate_json_rpc(method: str, params: List[Union[int, str]], request_id: int=1):
     return {
@@ -90,13 +91,94 @@ class EthNamespaceCore:
     @staticmethod
     def get_eth_get_balance_body(address: str, block_number: Union[int, str]="latest", request_id: int=1):
         method = "eth_getBalance"
-        params = [address, block_number]
+        params = [address, hex(block_number) if isinstance(block_number, int) else block_number]
         return generate_json_rpc(method, params, request_id=request_id)
 
     @staticmethod
     def get_eth_get_storage_at_body(address: str, storage_position: int, block_number: Union[int, str]="latest", request_id: int=1):
         method = "eth_getStorageAt"
-        params = [address, storage_position, block_number]
+        params = [address, storage_position, hex(block_number) if isinstance(block_number, int) else block_number]
         return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_transaction_count_body(address: str, block_number: Union[int, str]="latest", request_id: int=1):
+        method = "eth_getTransactionCount"
+        params = [address, hex(block_number) if isinstance(block_number, int) else block_number]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_block_transaction_count_by_hash_body(block_hash: str, request_id: int=1):
+        method = "eth_getBlockTransactionCountByHash"
+        params = [block_hash]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_block_transaction_count_by_number_body(block_number: Union[int, str]="latest", request_id: int=1):
+        method = "eth_getBlockTransactionCountByNumber"
+        params = [hex(block_number) if isinstance(block_number, int) else block_number]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_uncle_count_by_block_hash_body(block_hash: str, request_id: int=1):
+        method = "eth_getUncleCountByBlockHash"
+        params = [block_hash]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_uncle_count_by_block_number_body(block_number: Union[int, str]="latest", request_id: int=1):
+        method = "eth_getUncleCountByBlockNumber"
+        params = [hex(block_number) if isinstance(block_number, int) else block_number]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_code_body(address: str, block_number: Union[int, str]="latest", request_id: int=1):
+        method = "eth_getCode"
+        params = [address, hex(block_number) if isinstance(block_number) else block_number]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_sign_body(address: str, data: str, request_id: int=1):
+        method = "eth_sign"
+        params = [address, data]
+        return generate_json_rpc(address, data, request_id=request_id)
+
+    @staticmethod
+    def get_eth_sign_transaction_body(transaction: Transaction, request_id: int=1):
+        method = "eth_signTransaction"
+        params = [transaction.to_json()]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_send_transaction_body(transaction: Transaction, request_id: int=1):
+        method = "eth_sendTransaction"
+        params = [transaction.to_json()]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_send_raw_transaction_body(raw_transaction: str, request_id: int=1):
+        method = "eth_sendRawTransaction"
+        params = [raw_transaction]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_call_body(transaction: Transaction, request_id: int=1):
+        method = "eth_call"
+        params = [transaction.to_json()]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_estimate_gas_body(transaction: Transaction, request_id: int=1):
+        method = "eth_estimateGas"
+        params = [transaction.to_json()]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_block_by_hash_body(block_hash: str, request_id: int=1):
+        method = "eth_getBlockByHash"
+        params = [block_hash]
+        return generate_json_rpc(method, params, request_id=request_id)
+
+
+
 
 

@@ -33,7 +33,7 @@ class Transaction:
         for k, v in self.json.items():
             if type(v) == int:
                 v = str(hex(v))
-            if v:
+            if v is not None:
                 json[k] = v
         return json
 
@@ -66,6 +66,6 @@ class EthFilter:
         for k, v in self.json.items():
             if type(v) == int:
                 v = str(hex(v))
-            if v:
+            if v is not None:
                 json[k] = v
         return json

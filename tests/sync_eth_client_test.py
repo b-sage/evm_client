@@ -1,10 +1,18 @@
 import pytest
 from evm_client.sync_client import SyncEthClient
-from constants import ETH_RPC_URL
+from constants import ETH_RPC_URL, NULL_ADDRESS
 
 @pytest.fixture
 def client():
     return SyncEthClient(ETH_RPC_URL)
+
+@pytest.fixture
+def null_address():
+    return NULL_ADDRESS
+
+@pytest.fixture
+def block_num(client):
+    return int(client.block_number().json()['result'], 16)
 
 
 def test_get_block_number(client):
@@ -25,4 +33,8 @@ def test_syncing(client):
     assert type(syncing.json()) == dict
     assert syncing.status_code == 200
 
-
+def test_eth_get_balance(client, null_address, block_num):
+    bal = client.get_balance(null_address, block_number=block_num)
+    print(bal.json())
+    assert type(bal.json()) == dict
+    assert bal.status_code == 200

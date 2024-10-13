@@ -1,0 +1,15 @@
+[build-system]
+dynamic = ["dependencies"]
+requires = ["setuptools"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project]
+name = "evm-client"
+version = "1.0"
+description = "Simplistic EVM client"
+authors = [{name = "Ben Sage"}]
+maintainers = [{name = "Ben Sage"}]
+readme = "README.md"
+keywords = ["crypto", "web3", "ethereum", "blockchain", "evm_client"]

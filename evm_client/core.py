@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union
 from evm_client.types import Transaction, EthFilter
 
 def generate_json_rpc(method: str, params: List[Union[int, str]], request_id: int=1):
@@ -8,8 +8,6 @@ def generate_json_rpc(method: str, params: List[Union[int, str]], request_id: in
         'params': params,
         'id': request_id,
     }
-
-#TODO: cleanup Optional type hints... don't think I am making good use of these to convey meaning
 
 class AdminNamespaceCore:
 
@@ -55,12 +53,12 @@ class AdminNamespaceCore:
         return generate_json_rpc("admin_removeTrustedPeer", [peer_url], request_id=request_id)
 
     @staticmethod
-    def get_admin_start_http_body(host: Optional[str]="localhost", port: Optional[int]=8545, cors: Optional[str]="", apis: Optional[str]="eth,net,web3", request_id: int=1):
+    def get_admin_start_http_body(host: str="localhost", port: int=8545, cors: str="", apis: str="eth,net,web3", request_id: int=1):
         params = [host, str(hex(port)), cors, apis]
         return generate_json_rpc("admin_startHTTP", params, request_id=request_id)
 
     @staticmethod
-    def get_admin_start_ws_body(host: Optional[str]="localhost", port: Optional[int]=8545, cors: Optional[str]="", apis: Optional[str]="eth,net,web3", request_id: int=1):
+    def get_admin_start_ws_body(host: str="localhost", port: int=8545, cors: str="", apis: str="eth,net,web3", request_id: int=1):
         params = [host, str(hex(port)), cors, apis]
         return generate_json_rpc("admin_startWS", params, request_id=request_id)
 

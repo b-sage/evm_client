@@ -73,6 +73,27 @@ class AdminNamespaceCore:
         return generate_json_rpc("admin_stopWS", [], request_id=request_id)
 
 
+class DebugNamespaceCore:
+
+    #TODO: determine input types
+    @staticmethod
+    def get_debug_account_range_body():
+        pass
+
+    @staticmethod
+    def get_debug_backtrace_at_body(fname: str, line: int, request_id: int=1):
+        return generate_json_rpc("debug_backtraceAt", [f"{fname}:{line}"], request_id=request_id)
+
+    @staticmethod
+    def get_debug_block_profile_body(fname: str, duration: int, request_id: int=1):
+        params = [fname, str(hex(duration))]
+        return generate_json_rpc("debug_blockProfile", params, request_id=request_id)
+
+    @staticmethod
+    def get_debug_chaindb_compact(request_id: int=1):
+        return generate_json_rpc("debug_chaindbCompact", [], request_id=request_id)
+
+
 class Web3NamespaceCore:
     
     @staticmethod
@@ -226,7 +247,7 @@ class EthNamespaceCore:
 
     @staticmethod
     def get_eth_get_uncle_by_block_hash_and_index_body(block_hash: str, idx: int, request_id: int=1):
-        return generate_json_rpc("eth_getUncleByBlockHashAndIndex", [block_hash, str(hex(idx)), request_id=request_id)
+        return generate_json_rpc("eth_getUncleByBlockHashAndIndex", [block_hash, str(hex(idx))], request_id=request_id)
 
     @staticmethod
     def get_eth_get_uncle_by_block_number_and_index_body(block_number: Union[int, str], idx: int, request_id: int=1):

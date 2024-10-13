@@ -1,6 +1,6 @@
 from typing import Union
 from evm_client.core.utils import get_request_body
-from evm_client.types import Transaction, EthFilter, EthSimulation
+from evm_client.types import Transaction, EthFilter
 
 class EthCore:
 
@@ -165,6 +165,6 @@ class EthCore:
     def get_eth_get_logs_body(filter_: EthFilter, request_id: int=1):
         return get_request_body("eth_getLogs", [filter_.to_json()], request_id=request_id)
     
-    @staticmethod
-    def get_eth_simulate_v1_body(simulation: EthSimulation, block_number: Union[int, str], request_id: int=1):
-        pass
+#    @staticmethod
+#    def get_eth_simulate_v1_body(simulation: EthSimulation, block_number: Union[int, str], request_id: int=1):
+#        pass

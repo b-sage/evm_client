@@ -6,7 +6,7 @@ class SyncClientCore:
         self.url = node_url
 
     def make_post_request(self, body):
-        return requests.post(self.url, data=body)
+        return requests.post(self.url, json=body)
     
     #batch request func?
 

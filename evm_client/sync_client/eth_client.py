@@ -54,9 +54,17 @@ class SyncEthClient(SyncClientCore, EthCore):
         return process_http_response(res)
 
     def get_balance(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
-        body = self.get_eth_get_balance_body(address, block_number, request_id=request_id)
+        body = self.get_eth_get_balance_body(address, block_number=block_number, request_id=request_id)
         res = self.make_post_request(body)
         return hex_to_int(process_http_response(res))
 
+    def get_storage_at(self, address: str, storage_position:int, block_number: Union[int, str]="latest", request_id: int=1):
+        body = self.get_eth_get_storage_at_body(address, storage_position, block_number=block_number, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
 
+    def get_transaction_count(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
+        body = self.get_eth_get_transaction_count_body(address)
+        res = self.make_post_request(body)
+        return hex_to_int(process_http_response(res))
 

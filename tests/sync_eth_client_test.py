@@ -1,6 +1,6 @@
 import pytest
 from evm_client.sync_client import SyncEthClient
-from constants import ETH_RPC_URL, NULL_ADDRESS
+from constants import ETH_RPC_URL, NULL_ADDRESS, WETH
 
 @pytest.fixture
 def client():
@@ -9,6 +9,10 @@ def client():
 @pytest.fixture
 def null_address():
     return NULL_ADDRESS
+
+@pytest.fixture
+def weth():
+    return WETH
 
 @pytest.fixture
 def block_num(client):
@@ -64,3 +68,13 @@ def test_accounts(client):
     accounts = client.accounts()
     print(accounts)
     assert type(accounts) == list
+
+def test_get_storage_at(client, weth):
+    storage_at = client.get_storage_at(weth, 1)
+    print(storage_at)
+    assert type(storage_at) == str
+
+def test_get_transaction_count(client, weth):
+    tx_count = client.get_transaction_count(weth)
+    print(tx_count)
+    assert type(tx_count) == int

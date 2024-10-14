@@ -1,6 +1,8 @@
 import pytest
 from evm_client.sync_client import SyncEthClient
-from constants import ETH_RPC_URL, NULL_ADDRESS, WETH
+from constants import ETH_RPC_URL, NULL_ADDRESS, WETH, TRANSACTION_HASH
+
+#TODO: incorporate multiple networks
 
 @pytest.fixture
 def client():
@@ -17,6 +19,10 @@ def weth():
 @pytest.fixture
 def block_num(client):
     return client.block_number()
+
+@pytest.fixture
+def transaction_hash():
+    return TRANSACTION_HASH
 
 
 def test_get_block_number(client):
@@ -78,3 +84,8 @@ def test_get_transaction_count(client, weth):
     tx_count = client.get_transaction_count(weth)
     print(tx_count)
     assert type(tx_count) == int
+
+def test_get_transaction(client, transaction_hash):
+    tx = client.get_transaction(transaction_hash)
+    print(tx)
+    assert type(tx) == dict

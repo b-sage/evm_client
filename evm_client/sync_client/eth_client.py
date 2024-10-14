@@ -3,6 +3,7 @@ from evm_client.core import EthCore
 from evm_client.sync_client.client_core import SyncClientCore
 from evm_client.crypto_utils import hex_to_int
 from evm_client.sync_client.utils import process_http_response
+from evm_client.parsers.transaction import TransactionParser
 
 #probably best to parse the json and get the result from these?
 class SyncEthClient(SyncClientCore, EthCore):
@@ -68,3 +69,7 @@ class SyncEthClient(SyncClientCore, EthCore):
         res = self.make_post_request(body)
         return hex_to_int(process_http_response(res))
 
+    def get_transaction(self, transaction_hash: str, request_id: int=1):
+        body = self.get_eth_get_transaction_by_hash_body(transaction_hash)
+        res = self.make_post_request(body)
+        return TransactionParser.from_raw_json(process_http_response(res)).to_json()

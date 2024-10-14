@@ -25,7 +25,7 @@ class SyncEthClient(SyncClientCore, EthCore):
     def chain_id(self, request_id: int=1):
         body = self.get_eth_chain_id_body(request_id=request_id)
         res = self.make_post_request(body)
-        return process_http_request(res)
+        return hex_to_int(process_http_response(res))
 
     def block_number(self, request_id: int=1):
         body = self.get_eth_block_number_body(request_id=request_id)
@@ -34,20 +34,24 @@ class SyncEthClient(SyncClientCore, EthCore):
 
     def mining(self, request_id: int=1):
         body = self.get_eth_mining_body(request_id=request_id)
-        return self.make_post_request(body)
+        res =  self.make_post_request(body)
+        return process_http_response(res)
 
     def hashrate(self, request_id: int=1):
         body = self.get_eth_hashrate_body(request_id=request_id)
-        return self.make_post_request(body)
+        res = self.make_post_request(body)
+        return hex_to_int(process_http_response(res))
 
     def gas_price(self, request_id: int=1):
         body = self.get_eth_gas_price_body(request_id=request_id)
         res = self.make_post_request(body)
-        return process_http_response(res)
+        return hex_to_int(process_http_response(res))
 
+    #mostly expect this to not work on public nodes
     def accounts(self, request_id: int=1):
         body = self.get_eth_accounts_body(request_id=request_id)
-        return self.make_post_request(body)
+        res = self.make_post_request(body)
+        return process_http_response(res)
 
     def get_balance(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
         body = self.get_eth_get_balance_body(address, block_number, request_id=request_id)

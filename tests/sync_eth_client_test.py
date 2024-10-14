@@ -34,3 +34,33 @@ def test_eth_get_balance(client, null_address, block_num):
     bal = client.get_balance(null_address, block_number=block_num)
     print(bal)
     assert type(bal) == int
+
+def test_eth_chain_id(client):
+    chain_id = client.chain_id()
+    print(chain_id)
+    assert type(chain_id) == int
+
+def test_coinbase(client):
+    coinbase = client.coinbase()
+    print(coinbase)
+    assert type(coinbase) == str
+
+def test_mining(client):
+    mining = client.mining()
+    print(mining)
+    assert type(mining) == bool
+
+def test_hashrate(client):
+    hashrate = client.hashrate()
+    print(hashrate)
+    assert type(hashrate) == int
+
+def test_gas_price(client):
+    gas_price = client.gas_price()
+    print(gas_price)
+    assert type(gas_price) == int
+
+def test_accounts(client):
+    accounts = client.accounts()
+    print(accounts)
+    assert type(accounts) == list

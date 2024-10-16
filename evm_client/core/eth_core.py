@@ -95,8 +95,8 @@ class EthCore:
         return get_request_body("eth_sendRawTransaction", [raw_transaction], request_id=request_id)
 
     @staticmethod
-    def get_eth_call_body(transaction: Transaction, request_id: int=1):
-        return get_request_body("eth_call", [transaction.to_json()], request_id=request_id)
+    def get_eth_call_body(transaction: Transaction, block_number: Union[int, str]="latest", request_id: int=1):
+        return get_request_body("eth_call", [transaction.to_json(), hex(block_number) if isinstance(block_number, int) else block_number], request_id=request_id)
 
     @staticmethod
     def get_eth_estimate_gas_body(transaction: Transaction, request_id: int=1):
@@ -136,6 +136,10 @@ class EthCore:
     def get_eth_get_uncle_by_block_number_and_index_body(block_number: Union[int, str], idx: int, request_id: int=1):
         params = [str(hex(block_number)) if isinstance(block_number, int) else block_number, hex(idx)]
         return get_request_body("eth_getUncleByBlockNumberAndIndex", params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_blob_base_fee_body(request_id: int=1):
+        return get_request_body("eth_blobBaseFee", [], request_id=request_id)
 
     @staticmethod
     def get_eth_new_filter_body(filter_: EthFilter, request_id: int=1):

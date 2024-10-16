@@ -1,14 +1,16 @@
 import pytest
+import os
 from evm_client.sync_client import SyncEthClient
 from evm_client.types.transaction import Transaction
-from constants import ETH_RPC_URL, NULL_ADDRESS, WETH, FIRST_TRANSACTION_HASH, FIRST_BLOCK_HASH, ETH_USDC, ETH_BINANCE_PEG_ADDR
+from constants import NULL_ADDRESS, WETH, ETH_USDC, ETH_BINANCE_PEG_ADDR
 
 #TODO: incorporate multiple networks
 #TODO: cleanup fixtures. may make sense to test ex current block num and historical block num, current block hash vs historical etc
 
 @pytest.fixture
 def client():
-    return SyncEthClient(ETH_RPC_URL)
+    rpc_url = os.getenv('ETH_RPC_URL')
+    return SyncEthClient(rpc_url)
 
 @pytest.fixture
 def null_address():

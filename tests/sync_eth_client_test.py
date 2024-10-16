@@ -76,7 +76,7 @@ def test_get_block_number(client):
 def test_protocol_version(client):
     protocol_version = client.protocol_version()
     print(protocol_version)
-    assert type(protocol_version) == str
+    assert type(protocol_version) == int
 
 def test_syncing(client):
     syncing = client.syncing()
@@ -210,3 +210,18 @@ def test_get_transaction_receipt(client, transaction_hash):
     res = client.get_transaction_receipt(transaction_hash)
     print(res)
     assert type(res) == dict
+
+def test_get_uncle_by_block_hash_and_index(client, block_hash):
+    res = client.get_uncle_by_block_hash_and_index(block_hash, 1)
+    print(res)
+    assert type(res) == str or res is None
+
+def test_get_uncle_by_block_number_and_index(client, block_number):
+    res = client.get_uncle_by_block_number_and_index(block_number, 1)
+    print(res)
+    assert type(res) == str or res is None
+
+def test_blob_base_fee(client):
+    blob = client.blob_base_fee()
+    print(blob)
+    assert type(blob) == int

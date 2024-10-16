@@ -1,11 +1,13 @@
 from typing import Optional
 
+#TODO: think we need both SignedTransaction and UnsignedTransaction types
+
 class Transaction:
 
     def __init__(
             self, 
-            from_: str,
             input_: str,
+            from_: Optional[str]=None,
             to: Optional[str]=None, 
             gas: Optional[int]=None, 
             gas_price: Optional[int]=None, 
@@ -24,7 +26,7 @@ class Transaction:
             "to": self.to,
             "gas": self.gas,
             "gasPrice": self.gas_price,
-            "input": self.input_,
+            "data": self.input_,
             "nonce": self.nonce
         }
 

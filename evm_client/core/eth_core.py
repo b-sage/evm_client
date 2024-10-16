@@ -60,7 +60,7 @@ class EthCore:
         return get_request_body("eth_getBlockTransactionCountByHash", [block_hash], request_id=request_id)
 
     @staticmethod
-    def get_eth_block_transaction_count_by_number_body(block_number: Union[int, str]="latest", request_id: int=1):
+    def get_eth_get_block_transaction_count_by_number_body(block_number: Union[int, str]="latest", request_id: int=1):
         params = [str(hex(block_number)) if isinstance(block_number, int) else block_number]
         return get_request_body("eth_getBlockTransactionCountByNumber", params, request_id=request_id)
 
@@ -75,7 +75,7 @@ class EthCore:
 
     @staticmethod
     def get_eth_get_code_body(address: str, block_number: Union[int, str]="latest", request_id: int=1):
-        params = [address, str(hex(block_number)) if isinstance(block_number) else block_number]
+        params = [address, str(hex(block_number)) if isinstance(block_number, int) else block_number]
         return get_request_body("eth_getCode", params, request_id=request_id)
 
     @staticmethod
@@ -103,12 +103,12 @@ class EthCore:
         return get_request_body("eth_estimateGas", [transaction.to_json()], request_id=request_id)
 
     @staticmethod
-    def get_eth_get_block_by_hash_body(block_hash: str, request_id: int=1):
-        return get_request_body("eth_getBlockByHash", [block_hash], request_id=request_id)
+    def get_eth_get_block_by_hash_body(block_hash: str, include_transaction_detail: bool=True, request_id: int=1):
+        return get_request_body("eth_getBlockByHash", [block_hash, include_transaction_detail], request_id=request_id)
 
     @staticmethod
-    def get_eth_get_block_by_number_body(block_number: Union[int, str], request_id: int=1):
-        params = [str(hex(block_number)) if isinstance(block_number, int) else block_number]
+    def get_eth_get_block_by_number_body(block_number: Union[int, str], include_transaction_detail: bool=True, request_id: int=1):
+        params = [str(hex(block_number)) if isinstance(block_number, int) else block_number, include_transaction_detail]
         return get_request_body("eth_getBlockByNumber", params, request_id=request_id)
 
     @staticmethod

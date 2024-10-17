@@ -4,11 +4,11 @@ class AdminCore:
 
     @staticmethod
     def get_admin_add_peer_body(peer_url: str, request_id: int=1):
-        return get_request_body("admin_adPeer", [peer_url], request_id=request_id)
+        return get_request_body("admin_addPeer", [peer_url], request_id=request_id)
 
     @staticmethod
     def get_admin_add_trusted_peer_body(peer_url: str, request_id: int=1):
-        return get_request_body("admine_addTrustedPeer", [peer_url], request_id=request_id)
+        return get_request_body("admin_addTrustedPeer", [peer_url], request_id=request_id)
 
     @staticmethod
     def get_admin_datadir_body(request_id: int=1):

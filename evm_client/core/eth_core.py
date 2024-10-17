@@ -172,3 +172,31 @@ class EthCore:
 #    @staticmethod
 #    def get_eth_simulate_v1_body(simulation: EthSimulation, block_number: Union[int, str], request_id: int=1):
 #        pass
+
+    @staticmethod
+    def get_eth_get_account_body(address: str, block_number: Union[int, str]="latest", request_id: int=1):
+        return get_request_body("eth_getAccount", [address, hex(block_number) if isinstance(block_number, int) else block_number], request_id=request_id)
+
+    @staticmethod
+    def get_eth_get_block_receipts_body(block_number: Union[int, str]="latest", request_id: int=1):
+        return get_request_body("eth_getBlockReceipts", [hex(block_number) if isinstance(block_number, int) else block_number], request_id=request_id)
+
+    @staticmethod
+    def get_eth_max_priority_fee_per_gas_body(request_id: int=1):
+        return get_request_body("eth_maxPriorityFeePerGas", [], request_id=request_id)
+
+    @staticmethod
+    def get_eth_subscribe_body(subscription_name: str, include_transaction_detail: bool=True, data: Union[list, str]=None, request_id: int=1):
+        params = [subscription_name, include_transaction_detail]
+        if data:
+            params.append(data)
+        return get_request_body("eth_subscribe", params, request_id=request_id)
+
+    @staticmethod
+    def get_eth_unsubscribe_body(subscription_id: str, request_id: int=1):
+        return get_request_body("eth_unsubscribe", [subscription_id], request_id=request_id)
+
+    @staticmethod
+    def get_eth_create_access_list_body(transaction: Transaction, block_number: Union[int, str]="latest", request_id: int=1):
+        params = [transaction.to_json(), hex(block_number) if isinstance(block_number, int) else block_number]
+        return get_request_body("eth_createAccessList", params, request_id=request_id)

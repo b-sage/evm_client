@@ -3,8 +3,8 @@ from evm_client.core import EthCore
 from evm_client.sync_client.client_core import SyncClientCore
 from evm_client.crypto_utils import hex_to_int
 from evm_client.sync_client.utils import process_http_response
-from evm_client.parsers import parse_raw_transaction, parse_raw_block, parse_raw_receipt
-from evm_client.types.transaction import Transaction
+from evm_client.parsers import parse_raw_transaction, parse_raw_block, parse_raw_receipt, parse_raw_log
+from evm_client.types import Transaction, EthFilter
 
 #TODO: some methods block number is more of an optional arg where others it makes more sense to require it's passed, review these
 
@@ -179,3 +179,71 @@ class SyncEthClient(SyncClientCore, EthCore):
         body = self.get_eth_blob_base_fee_body(request_id=request_id)
         res = self.make_post_request(body)
         return hex_to_int(process_http_response(res))
+
+    def new_filter(self, filter_: EthFilter, request_id: int=1):
+        body = self.get_eth_new_filter_body(filter_, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def new_block_filter(self, request_id: int=1):
+        body = self.get_eth_new_block_filter_body(request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def new_pending_transaction_filter(self, request_id: int=1):
+        body = self.get_eth_new_pending_transaction_filter_body(request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def uninstall_filter(self, filter_id: str, request_id: int=1):
+        body = self.get_eth_uninstall_filter_body(filter_id, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def get_filter_changes(self, filter_id: str, request_id: int=1):
+        body = self.get_eth_get_filter_changes_body(filter_id, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def get_filter_logs(self, filter_id: str, request_id: int=1):
+        body = self.get_eth_get_filter_logs_body(filter_id, request_id=request_id)
+        res = self.make_post_request(body)
+        return [parse_raw_log(log) for log in process_http_response(res)]
+
+    def get_logs(self, filter_: EthFilter, request_id: int=1):
+        body = self.get_eth_get_logs_body(filter_, request_id=request_id)
+        res = self.make_post_request(body)
+        return [parse_raw_log(log).to_dict() for log in process_http_response(res)]
+
+    def get_account(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
+        body = self.get_eth_get_account_body(address, block_number, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def get_block_receipts(self, block_number: Union[int, str]="latest", request_id: int=1):
+        body = self.get_eth_get_block_receipts_body(block_number, request_id=request_id)
+        res = self.make_post_request(body)
+        return [parse_raw_receipt(r).to_dict() for r in process_http_response(res)]
+
+    def max_priority_fee_per_gas(self, request_id: int=1):
+        body = self.get_eth_max_priority_fee_per_gas_body(request_id=request_id)
+        res = self.make_post_request(body)
+        return hex_to_int(process_http_response(res))
+
+    def subscribe(self, subscription_name: str, include_transaction_detail: bool=True, data: Union[list, str]=None, request_id: int=1):
+        body = self.get_eth_subscribe_body(subscription_name, include_transaction_detail, data=data, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def unsubscribe(self, subscription_id: str, request_id: int=1):
+        body = self.get_eth_unsubscribe_body(subscription_id, request_id=request_id)
+        res = self.make_post_request(body)
+        return process_http_response(res)
+
+    def create_access_list(self, transaction: Transaction, block_number: Union[int, str]="latest", request_id: int=1):
+        body = self.get_eth_create_access_list_body(transaction, block_number, request_id=request_id)
+        res = self.make_post_request(body)
+        result = process_http_response(res)
+        #NOTE: do not love doing this type conversion in this method directly, but it's a bit weird as the access list in the transaction is a subset of the access list returned here
+        result['gasUsed'] = hex_to_int(result['gasUsed'])
+        return result

@@ -3,7 +3,7 @@ from evm_client.batch_client.utils import flatten, chunks, process_batch_http_re
 
 class BatchClientCore(SyncClientCore):
 
-    def make_batch_request(self, requests, inc=1000):
+    def make_batch_request(self, requests, inc=100):
         chunked_reqs = chunks(requests, inc)
         result = []
         for c in chunked_reqs:

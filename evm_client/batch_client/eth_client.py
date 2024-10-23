@@ -7,7 +7,7 @@ from evm_client.batch_client.utils import chunks
 class BatchEthClient(BatchClientCore, EthCore): 
 
     #TODO: definitely prefer instantiating the filter object within the method rather than outside. Update this in sync client
-    def get_logs_big_range(self, address: str, topics: List[str], start_block: int, end_block: int, block_inc=10000, req_inc=100):
+    def get_logs_big_range(self, address: str, topics: List[str], start_block: int, end_block: int, block_inc=10000, req_inc=50):
         chunked_range = chunks(list(range(start_block, end_block+1)), block_inc)
         filter_ = EthFilter(address=address, topics=topics) 
         req_id = 1

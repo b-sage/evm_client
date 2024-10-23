@@ -9,7 +9,7 @@ class BatchClientCore(SyncClientCore):
         result = []
         for c in chunked_reqs:
             res = process_batch_http_response(self.make_post_request(c))
-            time.sleep(0.25)
+            time.sleep(1)
             result.append(res)
         return flatten(result)
 

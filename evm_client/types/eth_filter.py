@@ -23,6 +23,14 @@ class EthFilter:
                 "blockHash": self.block_hash
         }
 
+    def set_from_block(self, from_block: Union[int, str]):
+        self.from_block = from_block
+        self.json['fromBlock'] = from_block
+
+    def set_to_block(self, to_block: Union[int, str]):
+        self.to_block = to_block
+        self.json['toBlock'] = to_block
+
     def to_json(self):
         json = {}
         for k, v in self.json.items():

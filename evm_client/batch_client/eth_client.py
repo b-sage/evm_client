@@ -16,7 +16,6 @@ class BatchEthClient(BatchClientCore, EthCore):
         for chunk in chunked_range:
             filter_.from_block = chunk[0]
             filter_.to_block = chunk[-1]
-            print(filter_.from_block, filter_.to_block)
             body = self.get_eth_get_logs_body(filter_, request_id=req_id)
             req_id += 1
             bodies.append(body)

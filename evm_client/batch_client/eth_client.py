@@ -19,7 +19,6 @@ class BatchEthClient(BatchClientCore, EthCore):
             body = self.get_eth_get_logs_body(filter_, request_id=req_id)
             req_id += 1
             bodies.append(body)
-            time.sleep(0.25)
         return self.make_batch_request(bodies, req_inc)
 
 

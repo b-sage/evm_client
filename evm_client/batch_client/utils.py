@@ -14,8 +14,7 @@ def process_batch_http_response(resp: Response):
             raise HTTPStatusError("Status code: {}".format(resp.status_code))
         results = resp.json()
         results_ = []
-        for r in results:
-            print(r)
+        for r in results['result']:
             if r.get('error'):
                 raise NodeError('Error: {}'.format(r['error']))
             results_ += r['result']

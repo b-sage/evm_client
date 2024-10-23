@@ -17,7 +17,6 @@ class BatchEthClient(BatchClientCore, EthCore):
             filter_.json['fromBlock'] = chunk[0]
             filter_.json['toBlock'] = chunk[-1]
             body = self.get_eth_get_logs_body(filter_, request_id=req_id)
-            print(body)
             req_id += 1
             bodies.append(body)
         return self.make_batch_request(bodies, req_inc)

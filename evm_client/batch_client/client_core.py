@@ -1,4 +1,3 @@
-import time
 import json
 from evm_client.sync_client.client_core import SyncClientCore
 from evm_client.batch_client.utils import flatten, chunks, process_batch_http_response
@@ -10,7 +9,6 @@ class BatchClientCore(SyncClientCore):
         result = []
         for c in chunked_reqs:
             res = process_batch_http_response(self.make_post_request(json.dumps(c)))
-            time.sleep(1)
             result.append(res)
         return flatten(result)
 

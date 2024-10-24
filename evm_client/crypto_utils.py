@@ -9,4 +9,4 @@ def unpack_address(packed_address: str):
     return to_checksum_address(decode(['address'], HexBytes(packed_address))[0])
 
 def decode_string(hex_str: str):
-    return decode(['string'], HexBytes(hex_str))
+    return decode(['string'], HexBytes(hex_str))[0]

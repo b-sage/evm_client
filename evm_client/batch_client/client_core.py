@@ -1,5 +1,6 @@
 from evm_client.sync_client.client_core import SyncClientCore
 from evm_client.batch_client.utils import chunks, process_batch_http_response
+from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
 

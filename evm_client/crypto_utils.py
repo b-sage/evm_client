@@ -10,3 +10,6 @@ def unpack_address(packed_address: str):
 
 def decode_string(hex_str: str):
     return decode(['string'], HexBytes(hex_str))[0]
+
+def decode_bytes32(hex_str: str):
+    return decode(['bytes32'], HexBytes(hex_str))[0]

@@ -13,6 +13,6 @@ class BatchClientCore(SyncClientCore):
                 chunk_res = process_batch_http_response(self.make_post_request(c))
                 res = {**res, **chunk_res}
             except NodeError as n:
-                n.results = res
+                n.results = {**res, **n.results}
                 raise n
         return res

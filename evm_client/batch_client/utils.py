@@ -19,4 +19,5 @@ def process_batch_http_response(resp: Response):
             if r.get('error'):
                 raise NodeError('Error: {}'.format(r['error']))
             results_ += r['result']
+        print(results_)
         return results_

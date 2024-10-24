@@ -8,5 +8,5 @@ class BatchClientCore(SyncClientCore):
         res = {}
         for c in chunked_reqs:
             chunk_res = process_batch_http_response(self.make_post_request(c))
-            res = {**res, **chunked_res}
+            res = {**res, **chunk_res}
         return res

@@ -13,11 +13,10 @@ def process_batch_http_response(resp: Response):
         if not resp.status_code == 200:
             raise HTTPStatusError("Status code: {}".format(resp.status_code))
         results = resp.json()
-        results_ = []
+        results_ = {}
         for r in results:
-            print(r)
             if r.get('error'):
                 raise NodeError('Error: {}'.format(r['error']))
-            results_ += r['result']
-        print(results_)
+            _id = r['id']
+            results_[_id] = r['result']
         return results_

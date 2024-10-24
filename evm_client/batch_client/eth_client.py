@@ -8,6 +8,7 @@ from evm_client.batch_client.utils import chunks
 class BatchEthClient(BatchClientCore, EthCore): 
 
     #TODO: definitely prefer instantiating the filter object within the method rather than outside. Update this in sync client
+    #want to ammend this todo, it may make more sense in some cases to do this way, but for things such as eth_call, passing objects make more sense
     def get_logs(self, address: str, topics: List[str], start_block: int, end_block: int, block_inc=1000, req_inc=100):
         chunked_range = chunks(list(range(start_block, end_block+1)), block_inc)
         filter_ = EthFilter(address=address, topics=topics) 

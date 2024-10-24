@@ -15,9 +15,9 @@ def process_batch_http_response(resp: Response):
         results = resp.json()
         results_ = {}
         for r in results:
-            print(r)
+            _id = r['id']
             if r.get('error'):
-                raise NodeError('Error: {}'.format(r['error']))
+                raise NodeError('Error: {}'.format(r['error']), r['error'], _id)
             _id = r['id']
             results_[_id] = r['result']
         return results_

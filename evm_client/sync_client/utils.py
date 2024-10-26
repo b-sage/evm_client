@@ -6,6 +6,6 @@ def process_http_response(resp: Response):
             raise HTTPStatusError("Status code: {}".format(resp.status_code))
         r = resp.json()
         if r.get('error'):
-            raise NodeError('Error: {}'.format(r['error']))
+            raise NodeError('Error: {}'.format(r['error']), r['id'])
         return r['result']
 

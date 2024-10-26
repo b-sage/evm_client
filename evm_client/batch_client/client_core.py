@@ -8,11 +8,10 @@ class BatchClientCore(SyncClientCore):
         chunked_reqs = chunks(requests, inc)
         res = {}
         for c in chunked_reqs:
-            #TODO: fix this hacky try except. Just doing this so we can pass already good results through when a batch request fails
-            try:
-                chunk_res = process_batch_http_response(self.make_post_request(c))
-                res = {**res, **chunk_res}
-            except NodeError as n:
-                n.results = {**res, **n.results}
-                raise n
-        return res
+            yield process_batch_http_response(self.make_post_request(c))
+            #                chunk_res = process_batch_http_response(self.make_post_request(c))
+            #    res = {**res, **chunk_res}
+            #except NodeError as n:
+            #    n.results = {**res, **n.results}
+            #    raise n
+        #return res

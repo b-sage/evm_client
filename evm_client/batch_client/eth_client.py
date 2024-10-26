@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Union
 from evm_client.batch_client.client_core import BatchClientCore
 from evm_client.core.eth_core import EthCore
 from evm_client.types import EthFilter
@@ -20,6 +20,14 @@ class BatchEthClient(BatchClientCore, EthCore):
             body = self.get_eth_get_logs_body(filter_, request_id=req_id)
             req_id += 1
             bodies.append(body)
+        return self.make_batch_request(bodies, req_inc)
+
+    def get_blocks_by_numbers(self, block_numbers: List[Union[int, str]], req_inc=100):
+        req_id = 1
+        bodies = []
+        for block_number in block_numbers:
+            bodies.append(self.get_eth_get_block_by_number_body(block_number, request_id=req_id))
+            req_id += 1
         return self.make_batch_request(bodies, req_inc)
 
 

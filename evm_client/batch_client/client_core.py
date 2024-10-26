@@ -6,7 +6,7 @@ class BatchClientCore(SyncClientCore):
 
     def make_batch_request(self, requests, inc=100):
         chunked_reqs = chunks(requests, inc)
-        res = {}
+        #res = {}
         for c in chunked_reqs:
             yield process_batch_http_response(self.make_post_request(c))
             #                chunk_res = process_batch_http_response(self.make_post_request(c))

@@ -8,6 +8,7 @@ from evm_client.parsers import parse_raw_block, parse_raw_log
 
 class BatchEthClient(BatchClientCore, EthCore): 
 
+    #NOTE request id irrelevant, no back mapping required
     def get_logs(self, address: str, topics: List[str], start_block: int, end_block: int, block_inc=1000, req_inc=100):
         chunked_range = chunks(list(range(start_block, end_block+1)), block_inc)
         filter_ = EthFilter(address=address, topics=topics) 
@@ -23,8 +24,9 @@ class BatchEthClient(BatchClientCore, EthCore):
         for response in result_generator:
             for request_id, logs in response.items():
                 for log in logs:
-                    yield(request_id, parse_raw_log(log).to_dict())
+                    yield(parse_raw_log(log).to_dict())
 
+    #NOTE: request id irrelevant, no back mapping required
     def get_blocks_by_numbers(self, block_numbers: List[Union[int, str]], req_inc=100):
         req_id = 1
         bodies = []
@@ -35,7 +37,7 @@ class BatchEthClient(BatchClientCore, EthCore):
         for response in result_generator:
             for request_id, blocks in response.values():
                 for block in blocks:
-                    yield(request_id, parse_raw_block(block).to_dict())
+                    yield(parse_raw_block(block).to_dict())
 
     #need to return mapping of request id -> result. Not sure how we can achieve this with yield
     def calls(self, transactions: List[Transaction], req_inc=100):

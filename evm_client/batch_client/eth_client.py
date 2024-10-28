@@ -2,7 +2,7 @@ import time
 from typing import List, Union
 from evm_client.batch_client.client_core import BatchClientCore
 from evm_client.core.eth_core import EthCore
-from evm_client.types import EthFilter
+from evm_client.types import EthFilter, Transaction
 from evm_client.batch_client.utils import chunks
 from evm_client.parsers import parse_raw_block, parse_raw_log
 
@@ -21,9 +21,9 @@ class BatchEthClient(BatchClientCore, EthCore):
             bodies.append(body)
         result_generator = self.make_batch_request(bodies, req_inc)
         for response in result_generator:
-            for logs in response.values():
+            for request_id, logs in response.items():
                 for log in logs:
-                    yield(parse_raw_log(log).to_dict())
+                    yield(request_id, parse_raw_log(log).to_dict())
 
     def get_blocks_by_numbers(self, block_numbers: List[Union[int, str]], req_inc=100):
         req_id = 1
@@ -33,8 +33,20 @@ class BatchEthClient(BatchClientCore, EthCore):
             req_id += 1
         result_generator = self.make_batch_request(bodies, req_inc)
         for response in result_generator:
-            for block in response.values():
-                yield(parse_raw_block(block).to_dict())
+            for request_id, blocks in response.values():
+                for block in blocks:
+                    yield(request_id, parse_raw_block(block).to_dict())
+
+    #need to return mapping of request id -> result. Not sure how we can achieve this with yield
+    def calls(self, transactions: List[Transaction], req_inc=100):
+        req_id = 1
+        bodies = []
+        for tx in transactions:
+            bodies.append(self.get_eth_call_body(tx, request_id=req_id))
+            req_id += 1
+        result_generator = self.make_batch_request(bodies, req_inc)
+        for r in result_generator:
+            print(r)
 
 
 

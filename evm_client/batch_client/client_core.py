@@ -16,7 +16,7 @@ class BatchClientCore(SyncClientCore):
                 #seems we're dropping entire chunk somehow?
                 print(n.request_id)
                 requests = [r for r in requests if r['id'] >= n.request_id]
-                return self._execute_drop_reverts(requests)
+                yield self._execute_drop_reverts(requests)
             except StopIteration:
                 break
 

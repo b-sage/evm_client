@@ -14,7 +14,7 @@ class BatchClientCore(SyncClientCore):
             #except StopIteration:
             #    break
             except NodeError:
-                pass
+                continue
             except StopIteration:
                 break
             else:

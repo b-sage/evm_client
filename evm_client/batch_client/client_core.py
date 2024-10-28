@@ -15,7 +15,6 @@ class BatchClientCore(SyncClientCore):
                 #why does this die?
                 requests = [r for r in requests if r['id'] != n.request_id]
                 self._execute_drop_reverts(requests)
-                break
             except StopIteration:
                 break
 

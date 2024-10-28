@@ -3,17 +3,20 @@ from evm_client.batch_client.utils import chunks, process_batch_http_response
 from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
- 
+
+
     def _validate_result(self, result):
         while True:
             try:
                 n = next(result)
                 if isinstance(n, NodeError):
                     raise n
-            except StopIteration:
-                break
+            #except StopIteration:
+            #    break
             except NodeError:
                 pass
+            except StopIteration:
+                break
             else:
                 yield n
 

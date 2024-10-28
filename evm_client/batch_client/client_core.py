@@ -11,10 +11,7 @@ class BatchClientCore(SyncClientCore):
             try:
                 yield process_batch_http_response(res)
             except NodeError as n:
-                print(n.request_id)
-                for c in chunk:
-                    print(c)
-                chunked_requests[i] = [c for c in chunk if c['request_id'] != n.request_id]
+                chunked_requests[i] = [c for c in chunk if c['id'] > n.request_id]
                 return self._execute_drop_reverts(chunked_requests)
 
     def _execute(self, chunked_requests):

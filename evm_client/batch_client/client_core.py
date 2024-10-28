@@ -5,7 +5,7 @@ from evm_client.errors import NodeError
 class BatchClientCore(SyncClientCore):
 
     def _execute_chunked_requests(self, chunked_requests):
-        for c in chunked_reqs:
+        for c in chunked_requests:
             res = self.make_post_request(c)
             yield process_batch_http_response(res)
 

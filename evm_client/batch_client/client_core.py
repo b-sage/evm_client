@@ -4,21 +4,22 @@ from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
     
+    def __process_chunk(self, chunk):
+        print([c['id'] for c in chunk])
+        res = self.make_post_request(chunk)
+        try:
+            yield process_batch_http_response(res)
+        except NodeError as n:
+            chunk = [c for c in chunk if c['id'] != n.request_id]
+            return self.__process_chunk(chunk)
+        except StopIteration:
+            pass
+
     #TODO: ensure NodeError is a revert
     def _execute_drop_reverts(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)
         for chunk in chunked_requests:
-            print([c['id'] for c in chunk])
-            res = self.make_post_request(chunk)
-            try:
-                yield process_batch_http_response(res)
-            except NodeError as n:
-                #seems we're dropping entire chunk somehow?
-                print(n.request_id)
-                requests = [r for r in requests if r['id'] >= n.request_id]
-                self._execute_drop_reverts(requests)
-            except StopIteration:
-                break
+            self.__process_chunk(chunk)
 
     def _execute(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)

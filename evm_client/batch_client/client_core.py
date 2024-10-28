@@ -9,11 +9,11 @@ class BatchClientCore(SyncClientCore):
             try:
                 n = next(result)
                 if isinstance(n, NodeError):
-                    continue
+                    raise n
             except StopIteration:
                 break
-            #except NodeError:
-            #    continue
+            except NodeError:
+                pass
             else:
                 yield n
 

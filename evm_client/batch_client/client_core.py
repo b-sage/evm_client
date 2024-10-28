@@ -4,12 +4,23 @@ from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
 
-    def make_batch_request(self, requests, inc=100):
-        chunked_reqs = chunks(requests, inc)
-        #would be nice to cache the post requests if possible so if we need to iterate more than once we don't need to hit the node again,
-        #but think we'll run into OOM storing those results and would be a headache to implement
+    def _execute_chunked_requests(self, chunked_requests):
         for c in chunked_reqs:
-            yield process_batch_http_response(self.make_post_request(c))
+            res = self.make_post_request(c)
+            yield process_batch_http_response(res)
+
+    def make_batch_request(self, requests, inc=100, drop_reverts=True):
+        chunked_reqs = chunks(requests, inc)
+        while True:
+            if drop_reverts:
+                try:
+                    return self._execute_chunked_requests(chunked_reqs)
+                except NodeError as n:
+                    bad_id = n.request_id
+                    requests = [r for r in requests in r['request_id'] > bad_id]
+                    chunked_reqs = chunks(requests, inc)
+            else:
+                return self._execute_chunked_requests(chunked_reqs)
 
     #NOTE: only applies one parser to all results. Want to put together a method to apply parsers
     #TODO: make parser funcs return a Parser object which has method .default()

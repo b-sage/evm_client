@@ -3,6 +3,19 @@ from evm_client.batch_client.utils import chunks, process_batch_http_response
 from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
+ 
+    def _validate_result(self, result):
+        while True:
+            try:
+                n = next(result)
+                if isinstance(n, NodeError):
+                    raise n
+            except StopIteration:
+                break
+            except NodeError:
+                continue
+            else:
+                yield n
 
     def _execute_chunked_requests(self, chunked_requests):
         for c in chunked_requests:
@@ -13,12 +26,7 @@ class BatchClientCore(SyncClientCore):
         chunked_reqs = chunks(requests, inc)
         while True:
             if drop_reverts:
-                try:
-                    return self._execute_chunked_requests(chunked_reqs)
-                except NodeError as n:
-                    bad_id = n.request_id
-                    requests = [r for r in requests in r['request_id'] > bad_id]
-                    chunked_reqs = chunks(requests, inc)
+                return self._validate_result(self._execute_chunked_requests(chunked_reqs))
             else:
                 return self._execute_chunked_requests(chunked_reqs)
 

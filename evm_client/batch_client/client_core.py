@@ -5,25 +5,26 @@ from evm_client.errors import NodeError
 class BatchClientCore(SyncClientCore):
     
     #TODO: ensure NodeError is a revert
-    def _execute_drop_reverts(self, chunked_requests):
+    def _execute_drop_reverts(self, requests, inc=100):
+        chunked_requests = chunks(requests, inc)
         for i, chunk in enumerate(chunked_requests):
             res = self.make_post_request(chunk)
             try:
                 yield process_batch_http_response(res)
             except NodeError as n:
-                chunked_requests[i] = [c for c in chunk if c['id'] > n.request_id]
-                return self._execute_drop_reverts(chunked_requests)
+                requests = [r for r in requests if r['id'] > n.request_id]
+                return self._execute_drop_reverts(requests)
 
-    def _execute(self, chunked_requests):
+    def _execute(self, requests, inc=100):
+        chunked_requests = chunks(requests, inc)
         for chunk in chunked_requests:
             yield process_http_response(self.make_post_request(chunk))
 
     def make_batch_request(self, requests, inc=100, drop_reverts=True):
-        chunked_reqs = chunks(requests, inc)
         if drop_reverts:
-            return self._execute_drop_reverts(chunked_reqs)
+            return self._execute_drop_reverts(requests, inc=inc)
         else:
-            return self._execute(chunked_reqs)
+            return self._execute(requests, inc=inc)
 
     #NOTE: only applies one parser to all results. Want to put together a method to apply parsers
     #TODO: make parser funcs return a Parser object which has method .default()

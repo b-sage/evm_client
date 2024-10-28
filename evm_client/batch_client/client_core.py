@@ -4,15 +4,17 @@ from evm_client.errors import NodeError
 
 class BatchClientCore(SyncClientCore):
 
+    #now, let's make sure we pass through all prior responses when we hit a failure
     def make_batch_request(self, requests, inc=100):
         chunked_reqs = chunks(requests, inc)
-        res = {}
         for c in chunked_reqs:
-            #TODO: fix this hacky try except. Just doing this so we can pass already good results through when a batch request fails
-            try:
-                chunk_res = process_batch_http_response(self.make_post_request(c))
-                res = {**res, **chunk_res}
-            except NodeError as n:
-                n.results = {**res, **n.results}
-                raise n
-        return res
+            yield process_batch_http_response(self.make_post_request(c))
+
+    #if one really prefers the results as a dict, they can use this. Expect to get OOM errors
+    @staticmethod
+    def generator_to_dict(generator):
+        result = {}
+        for res in generator:
+            for k, v in res.items():
+                result[k] = v
+        return result

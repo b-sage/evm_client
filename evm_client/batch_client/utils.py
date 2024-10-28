@@ -9,6 +9,7 @@ def chunks(lst, n):
 def flatten(xss):
     return [x for xs in xss for x in xs]
 
+#TODO: determine how to appoly yeild here properly, otherwise we're going to run into tons of OOM errors
 def process_batch_http_response(resp: Response):
         if not resp.status_code == 200:
             raise HTTPStatusError("Status code: {}".format(resp.status_code))
@@ -18,6 +19,5 @@ def process_batch_http_response(resp: Response):
             _id = r['id']
             if r.get('error'):
                 raise NodeError(r['error'], _id, results=results_)
-            _id = r['id']
             results_[_id] = r['result']
         return results_

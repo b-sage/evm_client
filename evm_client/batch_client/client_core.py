@@ -7,14 +7,13 @@ class BatchClientCore(SyncClientCore):
     #TODO: ensure NodeError is a revert
     def _execute_drop_reverts(self, chunked_requests):
         for i, chunk in enumerate(chunked_requests):
-            while True:
-                res = self.make_post_request(chunk)
-                try:
-                    yield process_batch_http_response(res)
-                except NodeError as n:
-                    print(n.request_id)
-                    chunked_requests[i] = [c for c in chunk if c['request_id'] != n.request_id]
-                    return self._execute_drop_reverts(chunked_requests)
+            res = self.make_post_request(chunk)
+            try:
+                yield process_batch_http_response(res)
+            except NodeError as n:
+                print(n.request_id)
+                chunked_requests[i] = [c for c in chunk if c['request_id'] != n.request_id]
+                return self._execute_drop_reverts(chunked_requests)
 
     def _execute(self, chunked_requests):
         for chunk in chunked_requests:

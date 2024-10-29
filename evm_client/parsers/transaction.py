@@ -1,34 +1,35 @@
 from typing import Optional
-from evm_client.crypto_utils import hex_to_int
 from evm_client.parsers.utils import assert_int, assert_str
+from evm_client.parsers.base import BaseParser
+from evm_client.parsers import parse_raw_hex_to_int
 
 
 #TODO: may be some fields we need to add as we test through networks
 def parse_raw_transaction(transaction_dict):
     return ParsedTransaction(
         block_hash=transaction_dict.get('blockHash', None),
-        block_number=hex_to_int(transaction_dict['blockNumber']) if transaction_dict.get('blockNumber') is not None else None,
+        block_number=parse_raw_hex_to_int(transaction_dict.get('blockNumber')).default_format(),
         from_=transaction_dict.get('from', None),
-        gas=hex_to_int(transaction_dict['gas']) if transaction_dict.get('gas') is not None else None,
-        gas_price=hex_to_int(transaction_dict['gasPrice']) if transaction_dict.get('gasPrice') is not None else None,
+        gas=parse_raw_hex_to_int(transaction_dict.get('gas')).default_format(),
+        gas_price=parse_raw_hex_to_int(transaction_dict.get('gasPrice')),
         hash_=transaction_dict.get('hash', None),
         input_=transaction_dict.get('input', None),
-        nonce=hex_to_int(transaction_dict['nonce']) if transaction_dict.get('nonce') is not None else None,
+        nonce=parse_raw_hex_to_int(transaction_dict.get('nonce')).default_format(),
         r=transaction_dict.get('r', None),
         s=transaction_dict.get('s', None),
         to=transaction_dict.get('to', None),
-        transaction_index=hex_to_int(transaction_dict['transactionIndex']) if transaction_dict.get('transactionIndex') is not None else None,
-        type_=hex_to_int(transaction_dict['type']) if transaction_dict.get('type') is not None else None,
-        v=hex_to_int(transaction_dict['v']) if transaction_dict.get('v') is not None else None,
-        value=hex_to_int(transaction_dict['value']) if transaction_dict.get('value') is not None else None,
+        transaction_index=parse_raw_hex_to_int(transaction_dict.get('transactionIndex')).default_format(),
+        type_=parse_raw_hex_to_int(transaction_dict.get('type')).default_format(),
+        v=parse_raw_hex_to_int(transaction_dict.get('v')).default_format(),
+        value=parse_raw_hex_to_int(transaction_dict.get('value')).default_format(),
         access_list=transaction_dict.get('accessList', None),
-        max_fee_per_gas=hex_to_int(transaction_dict['maxFeePerGas']) if transaction_dict.get('maxFeePerGas') is not None else None,
-        max_priority_fee_per_gas=hex_to_int(transaction_dict['maxPriorityFeePerGas']) if transaction_dict.get('maxPriorityFeePerGas') is not None else None,
-        chain_id=hex_to_int(transaction_dict['chainId']) if transaction_dict.get('chainId') is not None else None
+        max_fee_per_gas=parse_raw_hex_to_int(transaction_dict.get('maxFeePerGas')).default_format(),
+        max_priority_fee_per_gas=parse_raw_hex_to_int(transaction_dict.get('maxPriorityFeePerGas')).default_format(),
+        chain_id=parse_raw_hex_to_int(transaction_dict.get('chainId')).default_format()
     )
 
 
-class ParsedTransaction:
+class ParsedTransaction(BaseParser):
 
     def __init__(
         self,
@@ -118,3 +119,6 @@ class ParsedTransaction:
     def to_dict(self):
         d = self.as_dict()
         return {k:v for k,v in d.items() if v is not None}
+
+    def default_format(self):
+        return self.to_dict()

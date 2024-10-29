@@ -1,23 +1,24 @@
 from typing import Optional
-from evm_client.crypto_utils import hex_to_int
 from evm_client.parsers.utils import assert_int, assert_str
+from evm_client.parsers.base import BaseParser
+from evm_client.parsers import parse_raw_hex_to_int
 
 def parse_raw_receipt(receipt_dict):
     return ReceiptParser(
         block_hash=receipt_dict.get('blockHash', None),
-        block_number=hex_to_int(receipt_dict['blockNumber']) if receipt_dict.get('blockNumber') is not None else None,
+        block_number=parse_raw_hex_to_int(receipt_dict.get('blockNumber')).default_format(),
         contract_address=receipt_dict.get('contractAddress', None),
-        cumulative_gas_used=hex_to_int(receipt_dict['cumulativeGasUsed']) if receipt_dict.get('cumulativeGasUsed') is not None else None,
-        effective_gas_price=hex_to_int(receipt_dict['effectiveGasPrice']) if receipt_dict.get('effectiveGasPrice') is not None else None,
+        cumulative_gas_used=parse_raw_hex_to_int(receipt_dict.get('cumulativeGasUsed')).default_format(),
+        effective_gas_price=parse_raw_hex_to_int(receipt_dict.get('effectiveGasPrice')).default_format(),
         from_=receipt_dict.get('from', None),
-        gas_used=hex_to_int(receipt_dict['gasUsed']) if receipt_dict.get('gasUsed') is not None else None,
-        logs=[parse_raw_log(l).to_dict() for l in receipt_dict['logs']] if receipt_dict.get('logs') else None,
+        gas_used=parse_raw_hex_to_int(receipt_dict.get('gasUsed')).default_format(),
+        logs=[parse_raw_log(l).default_format() for l in receipt_dict['logs']] if receipt_dict.get('logs') else None,
         logs_bloom=receipt_dict.get('logsBloom', None),
-        status=hex_to_int(receipt_dict['status']) if receipt_dict.get('status') is not None else None,
+        status=parse_raw_hex_to_int(receipt_dict.get('status')).default_format(),
         to=receipt_dict.get('to', None),
         transaction_hash=receipt_dict.get('transactionHash', None),
-        transaction_index=hex_to_int(receipt_dict['transactionIndex']) if receipt_dict.get('transactionIndex') is not None else None,
-        type_=hex_to_int(receipt_dict['type']) if receipt_dict.get('type') is not None else None
+        transaction_index=parse_raw_hex_to_int(receipt_dict.get('transactionIndex')).default_format(),
+        type_=parse_raw_hex_to_int(receipt_dict.get('type')).default_format()
     )
 
 def parse_raw_log(log_dict):
@@ -25,15 +26,15 @@ def parse_raw_log(log_dict):
         address=log_dict.get('address', None),
         topics=log_dict.get('topics', None),
         data=log_dict.get('data', None),
-        block_number=hex_to_int(log_dict['blockNumber']) if log_dict.get('blockNumber') is not None else None,
+        block_number=parse_raw_hex_to_int(log_dict.get('blockNumber')).default_format(),
         transaction_hash=log_dict.get('transactionHash', None),
-        transaction_index=hex_to_int(log_dict['transactionIndex']) if log_dict.get('transactionIndex') is not None else None,
+        transaction_index=parse_raw_hex_to_int(log_dict.get('transactionIndex')).default_format(),
         block_hash=log_dict.get('blockHash', None),
-        log_index=hex_to_int(log_dict['logIndex']) if log_dict.get('logIndex') is not None else None,
+        log_index=parse_raw_hex_to_int(log_dict.get('logIndex')).default_format(),
         removed=log_dict.get('removed', None)
     )
 
-class ReceiptParser:
+class ReceiptParser(BaseParser):
 
     def __init__(
         self,
@@ -103,7 +104,10 @@ class ReceiptParser:
         d = self.as_dict()
         return {k:v for k,v in d.items() if v is not None}
 
-class LogParser:
+    def default_format(self):
+        return self.to_dict()
+
+class LogParser(BaseParser):
 
     def __init__(
         self,
@@ -152,3 +156,6 @@ class LogParser:
     def to_dict(self):
         d = self.as_dict()
         return {k:v for k,v in d.items() if v is not None}
+
+    def default_format(self):
+        return self.to_dict()

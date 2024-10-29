@@ -1,37 +1,38 @@
 from typing import Optional
-from evm_client.crypto_utils import hex_to_int
 from evm_client.parsers import parse_raw_transaction
+from evm_client.parsers import parse_raw_hex_to_int
 from evm_client.parsers.utils import assert_int, assert_str
+from evm_client.parsers.base import BaseParser
 
 
 #TODO: may be missing fields from other networks we'll have to fill as we test through
 def parse_raw_block(block_dict):
     return ParsedBlock(
-        base_fee_per_gas=hex_to_int(block_dict['baseFeePerGas']) if block_dict.get('baseFeePerGas') is not None else None,
-        blob_gas_used=hex_to_int(block_dict['blobGasUsed']) if block_dict.get('blobGasUsed') is not None else None,
-        difficulty=hex_to_int(block_dict['difficulty']) if block_dict.get('difficulty') is not None else None,
-        excess_blob_gas=hex_to_int(block_dict['excessBlobGas']) if block_dict.get('excessBlobGas') is not None else None,
+        base_fee_per_gas=parse_raw_hex_to_int(block_dict.get('baseFeePerGas')).default_format(),
+        blob_gas_used=parse_raw_hex_to_int(block_dict.get('blobGasUsed')).default_format(),
+        difficulty=parse_raw_hex_to_int(block_dict.get('difficulty')).default_format(),
+        excess_blob_gas=parse_raw_hex_to_int(block_dict.get('excessBlobGas')).default_format(),
         extra_data=block_dict.get('extraData', None),
-        gas_limit=hex_to_int(block_dict['gasLimit']) if block_dict.get('gasLimit') is not None else None,
-        gas_used=hex_to_int(block_dict['gasUsed']) if block_dict.get('gasUsed') is not None else None,
+        gas_limit=parse_raw_hex_to_int(block_dict.get('gasLimit')).default_format(),
+        gas_used=parse_raw_hex_to_int(block_dict.get('gasUsed')).default_format(),
         hash_=block_dict.get('hash', None),
         logs_bloom=block_dict.get('logsBloom', None),
         miner=block_dict.get('miner', None),
         mix_hash=block_dict.get('mixHash', None),
-        nonce=hex_to_int(block_dict['nonce']) if block_dict.get('nonce') is not None else None,
-        number=hex_to_int(block_dict['number']) if block_dict.get('number') is not None else None,
+        nonce=parse_raw_hex_to_int(block_dict.get('nonce')).default_format(),
+        number=parse_raw_hex_to_int(block_dict.get('number')).default_format(),
         parent_beacon_block_root=block_dict.get('parentBeaconBlockRoot', None),
         parent_hash=block_dict.get('parentHash', None),
         receipts_root=block_dict.get('receiptsRoot', None),
         sha3_uncles=block_dict.get('sha3Uncles', None),
-        size=hex_to_int(block_dict['size']) if not block_dict.get('size') is not None else None,
+        size=parse_raw_hex_to_int(block_dict.get('size')).default_format(),
         state_root=block_dict.get('stateRoot', None),
-        timestamp=hex_to_int(block_dict['timestamp']) if block_dict.get('timestamp') is not None else None,
-        total_difficulty=hex_to_int(block_dict['totalDifficulty']) if block_dict.get('totalDifficulty') is not None else None,
-        transactions=[parse_raw_transaction(tx).to_dict() for tx in block_dict['transactions']] if block_dict.get('transactions') is not None else None
+        timestamp=parse_raw_hex_to_int(block_dict.get('timestamp')).default_format(),
+        total_difficulty=parse_raw_hex_to_int(block_dict.get('totalDifficulty')).default_format(),
+        transactions=[parse_raw_transaction(tx).default_format() for tx in block_dict['transactions']] if block_dict.get('transactions') is not None else None
     )
 
-class ParsedBlock:
+class BlockParser(BaseParser):
 
     #TODO: these are not actually all optional, but in trying to be robust to cover many networks we'll leave them as such until we have a better
     #idea of which fields are consistent across networks and which aren't.
@@ -135,5 +136,7 @@ class ParsedBlock:
         d = self.as_dict()
         return {k:v for k,v in d.items() if v is not None}
 
+    def default_format(self):
+        return self.to_dict()
 
 

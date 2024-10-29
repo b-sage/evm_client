@@ -40,6 +40,7 @@ class BatchClientCore(SyncClientCore):
         for response in result_generator:
             for request_id, data in response.items():
                 for d in data:
+                    print(d)
                     yield(parser_func(d).to_dict())
 
     @staticmethod

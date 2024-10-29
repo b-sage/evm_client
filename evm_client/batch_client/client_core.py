@@ -13,11 +13,12 @@ class BatchClientCore(SyncClientCore):
             res = self.make_post_request(chunk)
             bad_ids = []
             while True:
+                print(bad_ids)
                 try:
                     yield process_batch_http_response(res, bad_ids)
                 except NodeError as n:
                     continue
-                except StopIteration:
+                else:
                     n = False
 
     def _execute(self, requests, inc=100):

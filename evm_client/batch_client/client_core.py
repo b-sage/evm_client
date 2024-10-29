@@ -12,7 +12,7 @@ class BatchClientCore(SyncClientCore):
         for chunk in chunked_requests:
             res = self.make_post_request(chunk)
             bad_ids = []
-            while True:
+            while n:
                 try:
                     yield process_batch_http_response(res, bad_ids)
                 except NodeError as n:

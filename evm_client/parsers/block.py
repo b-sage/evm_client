@@ -1,5 +1,5 @@
 from typing import Optional
-from evm_client.parsers import parse_raw_transaction
+from evm_client.parsers import parse_raw_transactions
 from evm_client.parsers import parse_raw_hex_to_int
 from evm_client.parsers.utils import assert_int, assert_str
 from evm_client.parsers.base import BaseParser
@@ -29,8 +29,11 @@ def parse_raw_block(block_dict):
         state_root=block_dict.get('stateRoot', None),
         timestamp=parse_raw_hex_to_int(block_dict.get('timestamp')).default_format(),
         total_difficulty=parse_raw_hex_to_int(block_dict.get('totalDifficulty')).default_format(),
-        transactions=[parse_raw_transaction(tx).default_format() for tx in block_dict['transactions']] if block_dict.get('transactions') is not None else None
+        transactions=[tx.default_format() for tx in parse_raw_transactions(block_dict['transactions'])] if block_dict.get('transactions') is not None else None
     )
+
+def parse_raw_blocks(block_dict_list):
+    return [parse_raw_block(b) for b in block_dict_list]
 
 class BlockParser(BaseParser):
 

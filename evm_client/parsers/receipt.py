@@ -12,7 +12,7 @@ def parse_raw_receipt(receipt_dict):
         effective_gas_price=parse_raw_hex_to_int(receipt_dict.get('effectiveGasPrice')).default_format(),
         from_=receipt_dict.get('from', None),
         gas_used=parse_raw_hex_to_int(receipt_dict.get('gasUsed')).default_format(),
-        logs=[parse_raw_log(l).default_format() for l in receipt_dict['logs']] if receipt_dict.get('logs') else None,
+        logs=[log.default_format() for log in parse_raw_logs(receipt_dict['logs'])] if receipt_dict.get('logs') else None,
         logs_bloom=receipt_dict.get('logsBloom', None),
         status=parse_raw_hex_to_int(receipt_dict.get('status')).default_format(),
         to=receipt_dict.get('to', None),
@@ -33,6 +33,12 @@ def parse_raw_log(log_dict):
         log_index=parse_raw_hex_to_int(log_dict.get('logIndex')).default_format(),
         removed=log_dict.get('removed', None)
     )
+
+def parse_raw_logs(log_dict_list):
+    return [parse_raw_log(l) for l in log_dict_list]
+
+def parse_raw_receipts(receipt_dict_list):
+    return [parse_raw_receipt(r) for r in receipt_dict_list]
 
 class ReceiptParser(BaseParser):
 

@@ -28,6 +28,9 @@ def parse_raw_transaction(transaction_dict):
         chain_id=parse_raw_hex_to_int(transaction_dict.get('chainId')).default_format()
     )
 
+def parse_raw_transactions(transaction_dict_list):
+    return [parse_raw_transaction(t) for t in transaction_dict_list]
+
 
 class ParsedTransaction(BaseParser):
 

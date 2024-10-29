@@ -11,6 +11,8 @@ class BatchClientCore(SyncClientCore):
         n = NodeError('', 0)
         for chunk in chunked_requests:
             n = NodeError('', 0)
+            for c in chunk:
+                print(c)
             res = self.make_post_request(chunk)
             for r in res:
                 print(r)

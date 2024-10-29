@@ -59,6 +59,7 @@ def parse_raw_receipt(
         type_=type_parser(receipt_dict.get('type'))
     ).default_format()
 
+
 def parse_raw_log(
         log_dict,
         address_parser=parse_null,

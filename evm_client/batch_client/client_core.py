@@ -15,8 +15,8 @@ class BatchClientCore(SyncClientCore):
             while n:
                 try:
                     yield process_batch_http_response(res, bad_ids)
-                except NodeError as n:
-                    continue
+                except NodeError as n_:
+                    n = n_
                 else:
                     n = False
                 

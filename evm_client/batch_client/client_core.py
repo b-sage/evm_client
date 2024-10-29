@@ -8,9 +8,9 @@ class BatchClientCore(SyncClientCore):
     def _execute_drop_reverts(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)
         #dummy error
-        n = NodeError('', 0)
         for chunk in chunked_requests:
             res = self.make_post_request(chunk)
+            n = NodeError('', 0)
             bad_ids = []
             while n:
                 try:
@@ -19,6 +19,7 @@ class BatchClientCore(SyncClientCore):
                     continue
                 else:
                     n = False
+                
 
     def _execute(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)

@@ -1,9 +1,10 @@
-import abc
+from evm_client.parsers.utils import underscore_to_camelcase
 
-class BaseParser(abc.ABC):
+class ParsedObject:
 
-    @abc.abstractmethod
-    def default_format(self):
-        pass
+    def as_dict(self):
+        return {underscore_to_camelcase(k).rstrip('_'): v for k,v in vars(self).items()}
 
-
+    def to_dict(self):
+        d = self.as_dict()
+        return {k: v for k, v in d.items() if v is not None}

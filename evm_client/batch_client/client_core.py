@@ -14,8 +14,7 @@ class BatchClientCore(SyncClientCore):
             for c in chunk:
                 print(c)
             res = self.make_post_request(chunk)
-            for r in res:
-                print(r)
+            print(res, type(res))
             while n:
                 try:
                     res = [r for r in res if r['id'] != n.request_id]

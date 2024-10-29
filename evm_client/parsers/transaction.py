@@ -1,34 +1,54 @@
-from typing import Optional
-from evm_client.parsers.utils import assert_int, assert_str
 from evm_client.parsers.base import BaseParser
-from evm_client.parsers import parse_raw_hex_to_int
-
+from evm_client.parsers import parse_raw_hex_to_int, parse_null
 
 #TODO: may be some fields we need to add as we test through networks
-def parse_raw_transaction(transaction_dict):
+def parse_raw_transaction(
+        transaction_dict,
+        block_hash_parser=parse_null,
+        block_number_parser=parse_raw_hex_to_int,
+        from_parser=parse_null,
+        gas_parser=parse_raw_hex_to_int,
+        gas_price_parser=parse_raw_hex_to_int,
+        hash_parser=parse_null,
+        input_parser=parse_null,
+        nonce_parser=parse_raw_hex_to_int,
+        r_parser=parse_null,
+        s_parser=parse_null,
+        to_parser=parse_null,
+        transaction_index_parser=parse_raw_hex_to_int,
+        type_parser=parse_raw_hex_to_int,
+        v_parser=parse_raw_hex_to_int,
+        value_parser=parse_raw_hex_to_int,
+        access_list_parser=parse_null,
+        max_fee_per_gas_parser=parse_raw_hex_to_int,
+        max_priority_fee_per_gas_parser=parse_raw_hex_to_int,
+        chain_id_parser=parse_raw_hex_to_int
+):
     return ParsedTransaction(
-        block_hash=transaction_dict.get('blockHash', None),
-        block_number=parse_raw_hex_to_int(transaction_dict.get('blockNumber')).default_format(),
-        from_=transaction_dict.get('from', None),
-        gas=parse_raw_hex_to_int(transaction_dict.get('gas')).default_format(),
-        gas_price=parse_raw_hex_to_int(transaction_dict.get('gasPrice')),
-        hash_=transaction_dict.get('hash', None),
-        input_=transaction_dict.get('input', None),
-        nonce=parse_raw_hex_to_int(transaction_dict.get('nonce')).default_format(),
-        r=transaction_dict.get('r', None),
-        s=transaction_dict.get('s', None),
-        to=transaction_dict.get('to', None),
-        transaction_index=parse_raw_hex_to_int(transaction_dict.get('transactionIndex')).default_format(),
-        type_=parse_raw_hex_to_int(transaction_dict.get('type')).default_format(),
-        v=parse_raw_hex_to_int(transaction_dict.get('v')).default_format(),
-        value=parse_raw_hex_to_int(transaction_dict.get('value')).default_format(),
-        access_list=transaction_dict.get('accessList', None),
-        max_fee_per_gas=parse_raw_hex_to_int(transaction_dict.get('maxFeePerGas')).default_format(),
-        max_priority_fee_per_gas=parse_raw_hex_to_int(transaction_dict.get('maxPriorityFeePerGas')).default_format(),
-        chain_id=parse_raw_hex_to_int(transaction_dict.get('chainId')).default_format()
-    )
+        block_hash=block_hash_parser(transaction_dict.get('blockHash')),
+        block_number=block_number_parser(transaction_dict.get('blockNumber')),
+        from_=from_parser(transaction_dict.get('from')),
+        gas=gas_parser(transaction_dict.get('gas')),
+        gas_price=gas_price_parser(transaction_dict.get('gasPrice')),
+        hash_=hash_parser(transaction_dict.get('hash')),
+        input_=input_parser(transaction_dict.get('input')),
+        nonce=nonce_parser(transaction_dict.get('nonce')),
+        r=r_parser(transaction_dict.get('r')),
+        s=s_parser(transaction_dict.get('s')),
+        to=to_parser(transaction_dict.get('to')),
+        transaction_index=transaction_index_parser(transaction_dict.get('transactionIndex')),
+        type_=type_parser(transaction_dict.get('type')),
+        v=v_parser(transaction_dict.get('v')),
+        value=value_parser(transaction_dict.get('value')),
+        access_list=access_list_parser(transaction_dict.get('accessList')),
+        max_fee_per_gas=max_fee_per_gas_parser(transaction_dict.get('maxFeePerGas')),
+        max_priority_fee_per_gas=max_priority_fee_per_gas_parser(transaction_dict.get('maxPriorityFeePerGas')),
+        chain_id=chain_id_parser(transaction_dict.get('chainId'))
+    ).default_format()
 
 def parse_raw_transactions(transaction_dict_list):
+    if not transaction_dict_list:
+        return []
     return [parse_raw_transaction(t) for t in transaction_dict_list]
 
 
@@ -56,43 +76,24 @@ class ParsedTransaction(BaseParser):
         max_priority_fee_per_gas: Optional[int]=None,
         chain_id: Optional[int]=None
     ):
-        assert_str(block_hash)
         self.block_hash = block_hash
-        assert_int(block_number)
         self.block_number = block_number
-        assert_str(from_)
         self.from_ = from_
-        assert_int(gas)
         self.gas = gas
-        assert_int(gas_price)
         self.gas_price = gas_price
-        assert_str(hash_)
         self.hash = hash_
-        assert_str(input_)
         self.input = input_
-        assert_int(nonce)
         self.nonce = nonce
-        assert_str(r)
         self.r = r
-        assert_str(s)
         self.s = s
-        assert_str(to)
         self.to = to
-        assert_int(transaction_index)
         self.transaction_index = transaction_index
-        assert_int(type_)
         self.type = type_
-        assert_int(v)
         self.v = v
-        assert_int(value)
         self.value = value
-        assert type(access_list) == list or access_list is None
         self.access_list = access_list
-        assert_int(max_fee_per_gas)
         self.max_fee_per_gas = max_fee_per_gas
-        assert_int(max_priority_fee_per_gas)
         self.max_priority_fee_per_gas = max_priority_fee_per_gas
-        assert_int(chain_id)
         self.chain_id = chain_id
 
 

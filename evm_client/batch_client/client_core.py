@@ -10,12 +10,11 @@ class BatchClientCore(SyncClientCore):
         #dummy error
         n = NodeError('', 0)
         for chunk in chunked_requests:
-            n = NodeError('', 0)
             res = self.make_post_request(chunk)
-            while n:
+            bad_ids = []
+            while True:
                 try:
-                    res = [r for r in res.json() if r['id'] != n.request_id]
-                    yield process_batch_http_response(res)
+                    yield process_batch_http_response(res, bad_ids)
                 except NodeError as n:
                     continue
                 except StopIteration:

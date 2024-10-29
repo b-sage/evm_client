@@ -7,7 +7,6 @@ class BatchClientCore(SyncClientCore):
     #TODO: ensure NodeError is a revert
     def _execute_drop_reverts(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)
-        #dummy error
         for chunk in chunked_requests:
             res = self.make_post_request(chunk)
             n = NodeError('', 0)
@@ -20,17 +19,19 @@ class BatchClientCore(SyncClientCore):
                 else:
                     n = False
                 
-
     def _execute(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)
         for chunk in chunked_requests:
             yield process_http_response(self.make_post_request(chunk))
 
-    def make_batch_request(self, requests, inc=100, drop_reverts=True):
+    def make_call_batch_request(self, requests, inc=100, drop_reverts=True):
         if drop_reverts:
             return self._execute_drop_reverts(requests, inc=inc)
         else:
             return self._execute(requests, inc=inc)
+
+    def make_batch_request(self, requests, inc=100):
+        return self._execute(requests, inc=inc)
 
     #NOTE: only applies one parser to all results. Want to put together a method to apply parsers
     #TODO: make parser funcs return a Parser object which has method .default()

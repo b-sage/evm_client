@@ -40,7 +40,7 @@ class BatchEthClient(BatchClientCore, EthCore):
         for tx in transactions:
             bodies.append(self.get_eth_call_body(tx, request_id=req_id))
             req_id += 1
-        result_generator = self.make_batch_request(bodies, req_inc, drop_reverts=drop_reverts)
+        result_generator = self.make_call_batch_request(bodies, req_inc, drop_reverts=drop_reverts)
         return self.yield_request_id_and_response_from_result(result_generator)
 
 

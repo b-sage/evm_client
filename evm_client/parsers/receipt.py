@@ -1,46 +1,99 @@
 from typing import Optional
 from evm_client.parsers.utils import assert_int, assert_str
 from evm_client.parsers.base import BaseParser
-from evm_client.parsers import parse_raw_hex_to_int
+from evm_client.parsers import parse_raw_hex_to_int, parse_null
 
-def parse_raw_receipt(receipt_dict):
-    return ReceiptParser(
-        block_hash=receipt_dict.get('blockHash', None),
-        block_number=parse_raw_hex_to_int(receipt_dict.get('blockNumber')).default_format(),
-        contract_address=receipt_dict.get('contractAddress', None),
-        cumulative_gas_used=parse_raw_hex_to_int(receipt_dict.get('cumulativeGasUsed')).default_format(),
-        effective_gas_price=parse_raw_hex_to_int(receipt_dict.get('effectiveGasPrice')).default_format(),
-        from_=receipt_dict.get('from', None),
-        gas_used=parse_raw_hex_to_int(receipt_dict.get('gasUsed')).default_format(),
-        logs=[log.default_format() for log in parse_raw_logs(receipt_dict['logs'])] if receipt_dict.get('logs') else None,
-        logs_bloom=receipt_dict.get('logsBloom', None),
-        status=parse_raw_hex_to_int(receipt_dict.get('status')).default_format(),
-        to=receipt_dict.get('to', None),
-        transaction_hash=receipt_dict.get('transactionHash', None),
-        transaction_index=parse_raw_hex_to_int(receipt_dict.get('transactionIndex')).default_format(),
-        type_=parse_raw_hex_to_int(receipt_dict.get('type')).default_format()
-    )
+#technically need to pass through all log parsers to parse_raw_log call
+def parse_raw_receipt(
+        receipt_dict,
+        block_hash_parser=parse_null,
+        block_number_parser=parse_raw_hex_to_int,
+        contract_address_parser=parse_null,
+        cumulative_gas_used_parser=parse_raw_hex_to_int,
+        effective_gas_price_parser=parse_raw_hex_to_int,
+        from_parser=parse_null,
+        gas_used_parser=parse_raw_hex_to_int,
+        logs_parser=parse_raw_logs,
+        #NOTE: must handle for list of logs, not individual log
+        logs_bloom_parser=parse_null,
+        status_parser=parse_raw_hex_to_int,
+        to_parser=parse_null,
+        transaction_hash_parser=parse_null,
+        transaction_index_parser=parse_raw_hex_to_int,
+        type_parser=parse_raw_hex_to_int,
+        log_address_parser=parse_null,
+        log_topics_parser=parse_null,
+        log_data_parser=parse_null,
+        log_block_number_parser=parse_raw_hex_to_int,
+        log_transaction_hash_parser=parse_null,
+        log_transaction_index_parser=parse_raw_hex_to_int,
+        log_block_hash_parser=parse_null,
+        log_log_index_parser=parse_raw_hex_to_int,
+        log_removed_parser=parse_null
+):
+    return ParsedReceipt(
+        block_hash=block_hash_parser(receipt_dict.get('blockHash')),
+        block_number=block_number_parser(receipt_dict.get('blockNumber')),
+        contract_address=contract_address_parser(receipt_dict.get('contractAddress'),
+        cumulative_gas_used=cumulative_gas_used_parser(receipt_dict.get('cumulativeGasUsed')),
+        effective_gas_price=effective_gas_price_parser(receipt_dict.get('effectiveGasPrice')),
+        from_=from_parser(receipt_dict.get('from')),
+        gas_used=gas_used_parser(receipt_dict.get('gasUsed')),
+        logs=logs_parser(
+            receipt_dict.get('logs'),
+            address_parser=log_address_parser,
+            topics_parser=log_topics_parser,
+            data_parser=log_data_parser,
+            block_number_parser=log_block_number_parser,
+            transaction_hash_parser=log_transaction_hash_parser,
+            transaction_index_parser=log_transaction_index_parser,
+            block_hash_parser=log_block_hash_parser,
+            log_index_parser=log_log_index_parser,
+            removed_parser=log_remove_parser
+        )
+        logs_bloom=logs_bloom_parser(receipt_dict.get('logsBloom')),
+        status=status_parser(receipt_dict.get('status')),
+        to=to_parser(receipt_dict.get('to')),
+        transaction_hash=transaction_hash_parser(receipt_dict.get('transactionHash')),
+        transaction_index=transaction_index_parser(receipt_dict.get('transactionIndex')),
+        type_=type_parser(receipt_dict.get('type'))
+    ).default_format()
 
-def parse_raw_log(log_dict):
-    return LogParser(
-        address=log_dict.get('address', None),
-        topics=log_dict.get('topics', None),
-        data=log_dict.get('data', None),
-        block_number=parse_raw_hex_to_int(log_dict.get('blockNumber')).default_format(),
-        transaction_hash=log_dict.get('transactionHash', None),
-        transaction_index=parse_raw_hex_to_int(log_dict.get('transactionIndex')).default_format(),
-        block_hash=log_dict.get('blockHash', None),
-        log_index=parse_raw_hex_to_int(log_dict.get('logIndex')).default_format(),
-        removed=log_dict.get('removed', None)
-    )
+def parse_raw_log(
+        log_dict,
+        address_parser=parse_null,
+        topics_parser=parse_null,
+        data_parser=parse_null,
+        block_number_parser=parse_raw_hex_to_int,
+        transaction_hash_parser=parse_null,
+        transaction_index_parser=parse_raw_hex_to_int,
+        block_hash_parser=parse_null,
+        log_index_parser=parse_raw_hex_to_int,
+        removed_parser=parse_null
+):
+    return ParsedLog(
+        address=address_parser(log_dict.get('address')),
+        topics=topics_parser(log_dict.get('topics')),
+        data=data_parser(log_dict.get('data')),
+        block_number=block_number_parser(log_dict.get('blockNumber')),
+        transaction_hash=transaction_hash_parser(log_dict.get('transactionHash')),
+        transaction_index=transaction_index_parser(log_dict.get('transactionIndex')),
+        block_hash=block_hash_parser(log_dict.get('blockHash')),
+        log_index=log_index_parser(log_dict.get('logIndex')),
+        removed=removed_parser(log_dict.get('removed'))
+    ).default_format()
 
 def parse_raw_logs(log_dict_list):
+    if not log_dict_list:
+        return []
     return [parse_raw_log(l) for l in log_dict_list]
 
 def parse_raw_receipts(receipt_dict_list):
+    if not receipt_dict_list:
+        return []
     return [parse_raw_receipt(r) for r in receipt_dict_list]
 
-class ReceiptParser(BaseParser):
+class ParsedReceipt(BaseParser):
 
     def __init__(
         self,
@@ -59,33 +112,19 @@ class ReceiptParser(BaseParser):
         transaction_index: Optional[int]=None,
         type_: Optional[int]=None
     ):
-        assert_str(block_hash)
         self.block_hash = block_hash
-        assert_int(block_number)
         self.block_number = block_number
-        assert_str(contract_address)
         self.contract_address = contract_address
-        assert_int(cumulative_gas_used)
         self.cumulative_gas_used = cumulative_gas_used
-        assert_int(effective_gas_price)
         self.effective_gas_price = effective_gas_price
-        assert_str(from_)
         self.from_ = from_
-        assert_int(gas_used)
         self.gas_used = gas_used
-        assert type(logs) == list or logs is None
         self.logs = logs
-        assert_str(logs_bloom)
         self.logs_bloom = logs_bloom
-        assert_int(status)
         self.status = status
-        assert_str(to)
         self.to = to
-        assert_str(transaction_hash)
         self.transaction_hash = transaction_hash
-        assert_int(transaction_index)
         self.transaction_index = transaction_index
-        assert_int(type_)
         self.type = type_
 
     def as_dict(self):
@@ -113,7 +152,7 @@ class ReceiptParser(BaseParser):
     def default_format(self):
         return self.to_dict()
 
-class LogParser(BaseParser):
+class ParsedLog(BaseParser):
 
     def __init__(
         self,
@@ -127,23 +166,14 @@ class LogParser(BaseParser):
         log_index: Optional[int]=None,
         removed: Optional[bool]=None
     ):
-        assert_str(address)
         self.address = address
-        assert type(topics) == list or topics is None
         self.topics = topics
-        assert_str(data)
         self.data = data
-        assert_int(block_number)
         self.block_number = block_number
-        assert_str(transaction_hash)
         self.transaction_hash = transaction_hash
-        assert_int(transaction_index)
         self.transaction_index = transaction_index
-        assert_str(block_hash)
         self.block_hash = block_hash
-        assert_int(log_index)
         self.log_index = log_index
-        assert type(removed) == bool or removed is None
         self.removed = removed
 
     def as_dict(self):

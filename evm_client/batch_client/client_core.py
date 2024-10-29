@@ -22,7 +22,7 @@ class BatchClientCore(SyncClientCore):
     def _execute(self, requests, inc=100):
         chunked_requests = chunks(requests, inc)
         for chunk in chunked_requests:
-            yield process_http_response(self.make_post_request(chunk))
+            yield process_batch_http_response(self.make_post_request(chunk))
 
     def make_call_batch_request(self, requests, inc=100, drop_reverts=True):
         if drop_reverts:

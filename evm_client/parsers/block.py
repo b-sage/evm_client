@@ -29,6 +29,7 @@ def parse_raw_block(block_dict):
         state_root=block_dict.get('stateRoot', None),
         timestamp=parse_raw_hex_to_int(block_dict.get('timestamp')).default_format(),
         total_difficulty=parse_raw_hex_to_int(block_dict.get('totalDifficulty')).default_format(),
+        #TODO: handle for case where only tx hashes are returned
         transactions=[tx.default_format() for tx in parse_raw_transactions(block_dict['transactions'])] if block_dict.get('transactions') is not None else None
     )
 

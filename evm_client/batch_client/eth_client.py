@@ -21,7 +21,7 @@ class BatchEthClient(BatchClientCore, EthCore):
             req_id += 1
             bodies.append(body)
         result_generator = self.make_batch_request(bodies, req_inc)
-        return self.yield_single_type_parsed_list_from_result(result_generator, parse_raw_log)
+        return self.yield_single_type_parsed_list_from_list_result(result_generator, parse_raw_log)
 
     #NOTE: request id irrelevant, no back mapping required
     def get_blocks_by_numbers(self, block_numbers: List[Union[int, str]], req_inc: int=100):
@@ -31,7 +31,7 @@ class BatchEthClient(BatchClientCore, EthCore):
             bodies.append(self.get_eth_get_block_by_number_body(block_number, request_id=req_id))
             req_id += 1
         result_generator = self.make_batch_request(bodies, req_inc)
-        return self.yield_single_type_parsed_list_from_result(result_generator, parse_raw_block)
+        return self.yield_single_type_parsed_list_from_dict_result(result_generator, parse_raw_block)
 
     #need to return mapping of request id -> result. Not sure how we can achieve this with yield
     def calls(self, transactions: List[Transaction], req_inc: int=100, drop_reverts: bool=True):

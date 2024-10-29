@@ -36,12 +36,18 @@ class BatchClientCore(SyncClientCore):
     #NOTE: only applies one parser to all results. Want to put together a method to apply parsers
     #TODO: make parser funcs return a Parser object which has method .default()
     @staticmethod
-    def yield_single_type_parsed_list_from_result(result_generator, parser_func):
+    def yield_single_type_parsed_list_from_list_result(result_generator, parser_func):
         for response in result_generator:
             for request_id, data in response.items():
                 for d in data:
                     print(d)
                     yield(parser_func(d).to_dict())
+
+    @staticmethod
+    def yield_single_type_parsed_list_from_dict_result(result_generator, parser_func):
+        for response in result_generator:
+            for request_id, data in response.items():
+                yield(parser_func(data).to_dict())
 
     @staticmethod
     def yield_request_id_and_response_from_result(result_generator):

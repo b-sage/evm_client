@@ -18,10 +18,10 @@ def process_batch_http_response(resp: Response, bad_ids: Union[List[int], None]=
         results_ = {}
         for r in results:
             _id = r['id']
+            print(_id)
             if bad_ids and _id in bad_ids:
                 continue
             if r.get('error'):
-                print(_id)
                 bad_ids.append(_id)
                 raise NodeError(r['error'], _id, results=results_)
             results_[_id] = r['result']

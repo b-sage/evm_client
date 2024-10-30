@@ -1,4 +1,4 @@
-from evm_client.parser.base import ParsedObject
+from evm_client.parsers.base import ParsedObject
 from evm_client.parsers import parse_raw_transactions, TransactionParserConfig
 from evm_client.converters import convert_hex_to_int, do_not_convert, convert_hex_to_datetime
 
@@ -102,8 +102,8 @@ class BlockParserConfig:
         self.state_root_converter = state_root_converter
         self.timestamp_converter = timestamp_converter
         self.total_dfifficulty_converter = total_difficulty_converter
-        self.transaction_parser = transactions_parser
-        self.transaction_parser_config = transactions_parser_config
+        self.transaction_parser = transaction_parser
+        self.transaction_parser_config = transaction_parser_config
 
 #TODO: may be missing fields from other networks we'll have to fill as we test through
 def parse_raw_block(block_dict, block_cfg=BlockParserConfig()):

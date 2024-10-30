@@ -1,5 +1,5 @@
 from typing import Any
 
-def parse_null(value: Any):
+def do_not_convert(value: Any):
     return value
 

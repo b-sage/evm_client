@@ -130,7 +130,7 @@ def parse_raw_block(block_dict, block_cfg=BlockParserConfig()):
         timestamp=block_cfg.timestamp_converter(block_dict.get('timestamp')),
         total_difficulty=block_cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
         #TODO: handle for case where only tx hashes are returned
-        transactions=transactions_parser(block_dict.get('transactions'), block_cfg.transaction_parser_config)
+        transactions=transactions_parser(block_dict.get('transactions'), tx_cfg=block_cfg.transaction_parser_config)
     ).to_dict()
 
 def parse_raw_blocks(block_dict_list, block_cfg=BlockParserConfig()):

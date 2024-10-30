@@ -1,6 +1,6 @@
 from evm_client.parsers.base import ParsedObject, Parser
 from evm_client.parsers import TransactionParser
-from evm_client.converters import convert_hex_to_int, do_not_convert, convert_hex_to_datetime
+from evm_client.converters import convert_hex_to_int, convert_hex_to_datetime
 
 class ParsedBlock(ParsedObject):
 
@@ -54,27 +54,28 @@ class ParsedBlock(ParsedObject):
 
 class BlockParserConfig:
 
+    #TODO: rather than using do_not_convert function, just set these to None, then in the converter check if it's None and leave the value as is if so
     def __init__(
             self,
             base_fee_per_gas_converter=convert_hex_to_int,
             blob_gas_used_converter=convert_hex_to_int,
             difficulty_converter=convert_hex_to_int,
             excess_blob_gas_converter=convert_hex_to_int,
-            extra_data_converter=do_not_convert,
+            extra_data_converter=None,
             gas_limit_converter=convert_hex_to_int,
             gas_used_converter=convert_hex_to_int,
-            hash_converter=do_not_convert,
-            logs_bloom_converter=do_not_convert,
-            miner_converter=do_not_convert,
-            mix_hash_converter=do_not_convert,
+            hash_converter=None,
+            logs_bloom_converter=None,
+            miner_converter=None,
+            mix_hash_converter=None,
             nonce_converter=convert_hex_to_int,
             number_converter=convert_hex_to_int,
-            parent_beacon_block_root_converter=do_not_convert,
-            parent_hash_converter=do_not_convert,
-            receipts_root_converter=do_not_convert,
-            sha3_uncles_converter=do_not_convert,
+            parent_beacon_block_root_converter=None,
+            parent_hash_converter=None,
+            receipts_root_converter=None,
+            sha3_uncles_converter=None,
             size_converter=convert_hex_to_int,
-            state_root_converter=do_not_convert,
+            state_root_converter=None,
             timestamp_converter=convert_hex_to_datetime,
             total_difficulty_converter=convert_hex_to_int,
             #NOTE: must handle for list of transactions, not just single tx
@@ -110,27 +111,27 @@ class BlockParser(Parser):
 
     def parse(self, block_dict):
         return ParsedBlock(
-            base_fee_per_gas=self.cfg.base_fee_per_gas_converter(block_dict.get('baseFeePerGas')),
-            blob_gas_used=self.cfg.blob_gas_used_converter(block_dict.get('blobGasUsed')),
-            difficulty=self.cfg.difficulty_converter(block_dict.get('difficulty')),
-            excess_blob_gas=self.cfg.excess_blob_gas_converter(block_dict.get('excessBlobGas')),
-            extra_data=self.cfg.extra_data_converter(block_dict.get('extraData')),
-            gas_limit=self.cfg.gas_limit_converter(block_dict.get('gasLimit')),
-            gas_used=self.cfg.gas_used_converter(block_dict.get('gasUsed')),
-            hash_=self.cfg.hash_converter(block_dict.get('hash')),
-            logs_bloom=self.cfg.logs_bloom_converter(block_dict.get('logsBloom')),
-            miner=self.cfg.miner_converter(block_dict.get('miner')),
-            mix_hash=self.cfg.mix_hash_converter(block_dict.get('mixHash')),
-            nonce=self.cfg.nonce_converter(block_dict.get('nonce')),
-            number=self.cfg.number_converter(block_dict.get('number')),
-            parent_beacon_block_root=self.cfg.parent_beacon_block_root_converter(block_dict.get('parentBeaconBlockRoot')),
-            parent_hash=self.cfg.parent_hash_converter(block_dict.get('parentHash')),
-            receipts_root=self.cfg.receipts_root_converter(block_dict.get('receiptsRoot')),
-            sha3_uncles=self.cfg.sha3_uncles_converter(block_dict.get('sha3Uncles')),
-            size=self.cfg.size_converter(block_dict.get('size')),
-            state_root=self.cfg.state_root_converter(block_dict.get('stateRoot')),
-            timestamp=self.cfg.timestamp_converter(block_dict.get('timestamp')),
-            total_difficulty=self.cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
+            base_fee_per_gas=self.apply_converter(self.cfg.base_fee_per_gas_converter, block_dict.get('baseFeePerGas')),
+            blob_gas_used=self.apply_converter(self.cfg.blob_gas_used_converter, block_dict.get('blobGasUsed')),
+            difficulty=self.apply_converter(self.cfg.difficulty_converter, block_dict.get('difficulty')),
+            excess_blob_gas=self.apply_converter(self.cfg.excess_blob_gas_converter, block_dict.get('excessBlobGas')),
+            extra_data=self.apply_converter(self.cfg.extra_data_converter, block_dict.get('extraData')),
+            gas_limit=self.apply_converter(self.cfg.gas_limit_converter, block_dict.get('gasLimit')),
+            gas_used=self.apply_converter(self.cfg.gas_used_converter, block_dict.get('gasUsed')),
+            hash_=self.apply_converter(self.cfg.hash_converter, block_dict.get('hash')),
+            logs_bloom=self.apply_converter(self.cfg.logs_bloom_converter, block_dict.get('logsBloom')),
+            miner=self.apply_converter(self.cfg.miner_converter, block_dict.get('miner')),
+            mix_hash=self.apply_converter(self.cfg.mix_hash_converter, block_dict.get('mixHash')),
+            nonce=self.apply_converter(self.cfg.nonce_converter, block_dict.get('nonce')),
+            number=self.apply_converter(self.cfg.number_converter, block_dict.get('number')),
+            parent_beacon_block_root=self.apply_converter(self.cfg.parent_beacon_block_root_converter, block_dict.get('parentBeaconBlockRoot')),
+            parent_hash=self.apply_converter(self.cfg.parent_hash_converter, block_dict.get('parentHash')),
+            receipts_root=self.apply_converter(self.cfg.receipts_root_converter, block_dict.get('receiptsRoot')),
+            sha3_uncles=self.apply_converter(self.cfg.sha3_uncles_converter, block_dict.get('sha3Uncles')),
+            size=self.apply_converter(self.cfg.size_converter, block_dict.get('size')),
+            state_root=self.apply_converter(self.cfg.state_root_converter, block_dict.get('stateRoot')),
+            timestamp=self.apply_converter(self.cfg.timestamp_converter, block_dict.get('timestamp')),
+            total_difficulty=self.apply_converter(self.cfg.total_difficulty_converter, block_dict.get('totalDifficulty')),
             #TODO: handle for case where only tx hashes are returned
             transactions=self.cfg.transaction_parser.parse_multiple(block_dict.get('transactions'))
         ).to_dict()

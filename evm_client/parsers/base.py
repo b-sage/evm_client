@@ -13,6 +13,10 @@ class ParsedObject:
 
 class Parser:
 
+    @staticmethod
+    def apply_converter(converter_func, item):
+        return converter_func(item) if converter_func else item
+
     @abc.abstractmethod
     def parse(self, item):
         pass

@@ -1,6 +1,6 @@
+from evm_client.parser.base import ParsedObject
 from evm_client.parsers import parse_raw_transactions, TransactionParserConfig
 from evm_client.converters import convert_hex_to_int, do_not_convert, convert_hex_to_datetime
-from evm_client.parsers.base import ParsedObject
 
 class ParsedBlock(ParsedObject):
 
@@ -130,7 +130,7 @@ def parse_raw_block(block_dict, block_cfg=BlockParserConfig()):
         timestamp=block_cfg.timestamp_converter(block_dict.get('timestamp')),
         total_difficulty=block_cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
         #TODO: handle for case where only tx hashes are returned
-        transactions=transactions_parser(block_dict.get('transactions'), tx_cfg=block_cfg.transaction_parser_config)
+        transactions=block_cfg.transaction_parser(block_dict.get('transactions'), tx_cfg=block_cfg.transaction_parser_config)
     ).to_dict()
 
 def parse_raw_blocks(block_dict_list, block_cfg=BlockParserConfig()):

@@ -89,7 +89,7 @@ class BlockParserConfig:
         self.gas_limit_converter = gas_limit_converter
         self.gas_used_converter = gas_used_converter
         self.hash_converter = hash_converter
-        self.log_bloom_converter = logs_bloom_converter
+        self.logs_bloom_converter = logs_bloom_converter
         self.miner_converter = miner_converter
         self.mix_hash_converter = mix_hash_converter
         self.nonce_converter = nonce_converter
@@ -101,14 +101,14 @@ class BlockParserConfig:
         self.size_converter = size_converter
         self.state_root_converter = state_root_converter
         self.timestamp_converter = timestamp_converter
-        self.total_dfifficulty_converter = total_difficulty_converter
+        self.total_difficulty_converter = total_difficulty_converter
         self.transaction_parser = transaction_parser
         self.transaction_parser_config = transaction_parser_config
 
 DEFAULT_BLOCK_PARSER_CFG = BlockParserConfig()
 
 #TODO: may be missing fields from other networks we'll have to fill as we test through
-def parse_raw_block(block_dict, parser_cfg_cfg=DEFAULT_BLOCK_PARSER_CFG):
+def parse_raw_block(block_dict, parser_cfg=DEFAULT_BLOCK_PARSER_CFG):
     return ParsedBlock(
         base_fee_per_gas=parser_cfg.base_fee_per_gas_converter(block_dict.get('baseFeePerGas')),
         blob_gas_used=parser_cfg.blob_gas_used_converter(block_dict.get('blobGasUsed')),

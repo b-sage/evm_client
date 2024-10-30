@@ -74,7 +74,7 @@ class TransactionParserConfig:
         self.from_converter = from_converter
         self.gas_converter = gas_converter
         self.gas_price_converter = gas_price_converter
-        self.hash_converfter = hash_converter
+        self.hash_converter = hash_converter
         self.input_converter = input_converter
         self.nonce_converter = nonce_converter
         self.r_converter = r_converter

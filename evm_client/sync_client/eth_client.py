@@ -3,7 +3,7 @@ from evm_client.core import EthCore
 from evm_client.sync_client.client_core import SyncClientCore
 from evm_client.crypto_utils import hex_to_int
 from evm_client.sync_client.utils import process_http_response
-from evm_client.parsers import parse_raw_transaction, parse_raw_block, parse_raw_receipt, parse_raw_log
+from evm_client.parsers import parse_raw_transaction, parse_raw_block, parse_raw_receipt, parse_raw_logs, parse_raw_receipts
 from evm_client.types import Transaction, EthFilter
 
 #TODO: some methods block number is more of an optional arg where others it makes more sense to require it's passed, review these
@@ -74,7 +74,7 @@ class SyncEthClient(SyncClientCore, EthCore):
     def get_transaction(self, transaction_hash: str, request_id: int=1):
         body = self.get_eth_get_transaction_by_hash_body(transaction_hash, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_transaction(process_http_response(res)).to_dict()
+        return parse_raw_transaction(process_http_response(res))
 
     def get_block_transaction_count_by_hash(self, block_hash: str, request_id: int=1):
         body = self.get_eth_get_block_transaction_count_by_hash_body(block_hash, request_id=request_id)
@@ -143,27 +143,27 @@ class SyncEthClient(SyncClientCore, EthCore):
     def get_block_by_number(self, block_number: Union[int, str], include_transaction_detail: bool=True, request_id: int=1):
         body = self.get_eth_get_block_by_number_body(block_number, include_transaction_detail=include_transaction_detail, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_block(process_http_response(res)).to_dict()
+        return parse_raw_block(process_http_response(res))
 
     def get_block_by_hash(self, block_hash: str, include_transaction_detail: bool=True, request_id: int=1):
         body = self.get_eth_get_block_by_hash_body(block_hash, include_transaction_detail=include_transaction_detail, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_block(process_http_response(res)).to_dict()
+        return parse_raw_block(process_http_response(res))
 
     def get_transaction_by_block_hash_and_index(self, block_hash: str, idx: int, request_id: int=1):
         body = self.get_eth_get_transaction_by_block_hash_and_index_body(block_hash, idx, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_transaction(process_http_response(res)).to_dict()
+        return parse_raw_transaction(process_http_response(res))
 
     def get_transaction_by_block_number_and_index(self, block_number: Union[int, str], idx: int, request_id: int=1):
         body = self.get_eth_get_transaction_by_block_number_and_index_body(block_number, idx, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_transaction(process_http_response(res)).to_dict()
+        return parse_raw_transaction(process_http_response(res))
 
     def get_transaction_receipt(self, transaction_hash: str, request_id: int=1):
         body = self.get_eth_get_transaction_receipt_body(transaction_hash, request_id=request_id)
         res = self.make_post_request(body)
-        return parse_raw_receipt(process_http_response(res)).to_dict()
+        return parse_raw_receipt(process_http_response(res))
 
     def get_uncle_by_block_hash_and_index(self, block_hash: str, idx: int, request_id: int=1):
         body = self.get_eth_get_uncle_by_block_hash_and_index_body(block_hash, idx, request_id=request_id)
@@ -208,12 +208,12 @@ class SyncEthClient(SyncClientCore, EthCore):
     def get_filter_logs(self, filter_id: str, request_id: int=1):
         body = self.get_eth_get_filter_logs_body(filter_id, request_id=request_id)
         res = self.make_post_request(body)
-        return [parse_raw_log(log) for log in process_http_response(res)]
+        return parse_raw_logs(process_http_response(res))
 
     def get_logs(self, filter_: EthFilter, request_id: int=1):
         body = self.get_eth_get_logs_body(filter_, request_id=request_id)
         res = self.make_post_request(body)
-        return [parse_raw_log(log).to_dict() for log in process_http_response(res)]
+        return parse_raw_logs(process_http_response(res))
 
     def get_account(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
         body = self.get_eth_get_account_body(address, block_number, request_id=request_id)
@@ -223,7 +223,7 @@ class SyncEthClient(SyncClientCore, EthCore):
     def get_block_receipts(self, block_number: Union[int, str]="latest", request_id: int=1):
         body = self.get_eth_get_block_receipts_body(block_number, request_id=request_id)
         res = self.make_post_request(body)
-        return [parse_raw_receipt(r).to_dict() for r in process_http_response(res)]
+        return parse_raw_receipts(process_http_response(res))
 
     def max_priority_fee_per_gas(self, request_id: int=1):
         body = self.get_eth_max_priority_fee_per_gas_body(request_id=request_id)

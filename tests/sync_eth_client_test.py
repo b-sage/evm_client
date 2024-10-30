@@ -7,44 +7,44 @@ from constants import NULL_ADDRESS, WETH, ETH_USDC, ETH_BINANCE_PEG_ADDR
 #TODO: incorporate multiple networks
 #TODO: cleanup fixtures. may make sense to test ex current block num and historical block num, current block hash vs historical etc
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
     rpc_url = os.getenv('ETH_RPC_URL')
     return SyncEthClient(rpc_url)
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def null_address():
     return NULL_ADDRESS
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def weth():
     return WETH
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def block_num(client):
-    return client.block_number()
+    return client.block_number() - 10000
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def block(client, block_num):
     return client.get_block_by_number(block_num)
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def block_number(block):
     return block['number']
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def block_hash(block):
     return block['hash']
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def transaction_hash(block):
     return block['transactions'][0]['hash']
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def peg():
     return ETH_BINANCE_PEG_ADDR
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def transaction(null_address):
     return Transaction(
         '0x',
@@ -53,15 +53,15 @@ def transaction(null_address):
         value=1
     )
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def usdc():
     return ETH_USDC
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def raw_transaction():
     return ''
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def usdc_balance_of_tx(usdc, peg, null_address):
     n = peg[2:]
     return Transaction(
@@ -69,7 +69,7 @@ def usdc_balance_of_tx(usdc, peg, null_address):
         to=usdc
     )
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def usdc_filter_(client, usdc, block_number):
     return EthFilter(
         from_block=block_number-100,
@@ -78,11 +78,11 @@ def usdc_filter_(client, usdc, block_number):
         topics=["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"]
     )
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def filter_id(client, usdc_filter_):
     return client.new_filter(usdc_filter_)
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def subscription_id(client):
     return client.subscribe("logs")
 

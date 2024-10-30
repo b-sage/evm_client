@@ -1,6 +1,6 @@
 from evm_client.parsers.base import ParsedObject
 from evm_client.converters import convert_hex_to_int, do_not_convert
-from evm_client.parsers import parse_raw_log, DEFAULT_LOG_PARSER_CFG
+from evm_client.parsers import parse_raw_logs, DEFAULT_LOG_PARSER_CFG
 
 class ParsedReceipt(ParsedObject):
 
@@ -62,13 +62,14 @@ class ReceiptParserConfig:
         self.cumulative_gas_used_converter = cumulative_gas_used_converter
         self.effective_gas_price_converter = effective_gas_price_converter
         self.from_converter = from_converter
+        self.gas_used_converter = gas_used_converter
         self.log_parser = log_parser
         self.log_parser_config = log_parser_config
         self.logs_bloom_converter = logs_bloom_converter
         self.status_converter = status_converter
         self.to_converter = to_converter
         self.transaction_hash_converter = transaction_hash_converter
-        self.transaction_index_converter = transaction_index_convert
+        self.transaction_index_converter = transaction_index_converter
         self.type_converter = type_converter
 
 DEFAULT_RECEIPT_PARSER_CFG = ReceiptParserConfig()
@@ -82,7 +83,7 @@ def parse_raw_receipt(receipt_dict, parser_cfg=DEFAULT_RECEIPT_PARSER_CFG):
         effective_gas_price=parser_cfg.effective_gas_price_converter(receipt_dict.get('effectiveGasPrice')),
         from_=parser_cfg.from_converter(receipt_dict.get('from')),
         gas_used=parser_cfg.gas_used_converter(receipt_dict.get('gasUsed')),
-        logs=parser_cfg.log_parser(receipt_dict.get('logs'), parser_cfg=parser_cfg.log_parser_config)
+        logs=parser_cfg.log_parser(receipt_dict.get('logs'), parser_cfg=parser_cfg.log_parser_config),
         logs_bloom=parser_cfg.logs_bloom_converter(receipt_dict.get('logsBloom')),
         status=parser_cfg.status_converter(receipt_dict.get('status')),
         to=parser_cfg.to_converter(receipt_dict.get('to')),

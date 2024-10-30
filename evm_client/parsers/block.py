@@ -132,7 +132,7 @@ class BlockParser(Parser):
             timestamp=self.cfg.timestamp_converter(block_dict.get('timestamp')),
             total_difficulty=self.cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
             #TODO: handle for case where only tx hashes are returned
-            transactions=self.cfg.transaction_parser.parse(block_dict.get('transactions'))
+            transactions=self.cfg.transaction_parser.parse_multiple(block_dict.get('transactions'))
         ).to_dict()
 
 

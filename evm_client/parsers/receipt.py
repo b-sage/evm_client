@@ -85,7 +85,7 @@ class ReceiptParser(Parser):
             from_=self.cfg.from_converter(receipt_dict.get('from')),
             gas_used=self.cfg.gas_used_converter(receipt_dict.get('gasUsed')),
             logs_bloom=self.cfg.logs_bloom_converter(receipt_dict.get('logsBloom')),
-            logs=self.cfg.log_parser.parse(receipt_dict.get('logs')),
+            logs=self.cfg.log_parser.parse_multiple(receipt_dict.get('logs')),
             status=self.cfg.status_converter(receipt_dict.get('status')),
             to=self.cfg.to_converter(receipt_dict.get('to')),
             transaction_hash=self.cfg.transaction_hash_converter(receipt_dict.get('transactionHash')),

@@ -57,29 +57,29 @@ class BlockParserConfig:
     #TODO: rather than using do_not_convert function, just set these to None, then in the converter check if it's None and leave the value as is if so
     def __init__(
             self,
-            base_fee_per_gas_converter=convert_hex_to_int,
-            blob_gas_used_converter=convert_hex_to_int,
-            difficulty_converter=convert_hex_to_int,
-            excess_blob_gas_converter=convert_hex_to_int,
+            base_fee_per_gas_converter=None,
+            blob_gas_used_converter=None,
+            difficulty_converter=None,
+            excess_blob_gas_converter=None,
             extra_data_converter=None,
-            gas_limit_converter=convert_hex_to_int,
-            gas_used_converter=convert_hex_to_int,
+            gas_limit_converter=None,
+            gas_used_converter=None,
             hash_converter=None,
             logs_bloom_converter=None,
             miner_converter=None,
             mix_hash_converter=None,
-            nonce_converter=convert_hex_to_int,
-            number_converter=convert_hex_to_int,
+            nonce_converter=None,
+            number_converter=None,
             parent_beacon_block_root_converter=None,
             parent_hash_converter=None,
             receipts_root_converter=None,
             sha3_uncles_converter=None,
-            size_converter=convert_hex_to_int,
+            size_converter=None,
             state_root_converter=None,
-            timestamp_converter=convert_hex_to_datetime,
-            total_difficulty_converter=convert_hex_to_int,
+            timestamp_converter=None,
+            total_difficulty_converter=None,
             #NOTE: must handle for list of transactions, not just single tx
-            transaction_parser=TransactionParser()
+            transaction_parser=None
     ):
         self.base_fee_per_gas_converter = base_fee_per_gas_converter
         self.blob_gas_used_converter = blob_gas_used_converter
@@ -104,9 +104,26 @@ class BlockParserConfig:
         self.total_difficulty_converter = total_difficulty_converter
         self.transaction_parser = transaction_parser
 
+    @classmethod
+    def default(cls):
+        return cls(
+            base_fee_per_gas_converter=convert_hex_to_int,
+            blob_gas_used_converter=convert_hex_to_int,
+            difficulty_converter=convert_hex_to_int,
+            excess_blob_gas_converter=convert_hex_to_int,
+            gas_limit_converter=convert_hex_to_int,
+            gas_used_converter=convert_hex_to_int,
+            nonce_converter=convert_hex_to_int,
+            number_converter=convert_hex_to_int,
+            size_converter=convert_hex_to_int,
+            timestamp_converter=convert_hex_to_datetime,
+            total_difficulty_converter=convert_hex_to_int,
+            transaction_parser=TransactionParser()
+        )
+
 class BlockParser(Parser):
 
-    def __init__(self, cfg: BlockParserConfig=BlockParserConfig()):
+    def __init__(self, cfg: BlockParserConfig=BlockParserConfig.default()):
         self.cfg = cfg
 
     def parse(self, block_dict):

@@ -103,6 +103,6 @@ class ReceiptParser(Parser):
             to=self.apply_converter(self.cfg.to_converter, receipt_dict.get('to')),
             transaction_hash=self.apply_converter(self.cfg.transaction_hash_converter, receipt_dict.get('transactionHash')),
             transaction_index=self.apply_converter(self.cfg.transaction_index_converter, receipt_dict.get('transactionIndex')),
-            type_=self.apply_converter(self.cfg.typ_converter, receipt_dict.get('type'))
+            type_=self.apply_converter(self.cfg.type_converter, receipt_dict.get('type'))
         ).to_dict()
 

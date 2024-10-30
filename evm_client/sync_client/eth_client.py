@@ -56,7 +56,7 @@ class SyncEthClient(SyncClientCore, EthCore):
     def hashrate(self, request_id: int=1):
         body = self.get_eth_hashrate_body(request_id=request_id)
         res = self.make_post_request(body)
-        return process_http_response(res)
+        return convert_hex_to_int(process_http_response(res))
 
     def gas_price(self, request_id: int=1):
         body = self.get_eth_gas_price_body(request_id=request_id)

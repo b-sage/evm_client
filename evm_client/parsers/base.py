@@ -1,3 +1,4 @@
+import abc
 from evm_client.parsers.utils import underscore_to_camelcase
 
 class ParsedObject:
@@ -8,3 +9,15 @@ class ParsedObject:
     def to_dict(self):
         d = self.as_dict()
         return {k: v for k, v in d.items() if v is not None}
+
+
+class Parser:
+
+    @abc.abstractmethod
+    def parse(self, item):
+        pass
+
+    def parse_multiple(self, items):
+        if not items:
+            return []
+        return [self.parse(item) for item in items]

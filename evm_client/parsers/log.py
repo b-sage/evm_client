@@ -1,4 +1,4 @@
-from evm_client.parsers.base import ParsedObject
+from evm_client.parsers.base import ParsedObject, Parser
 from evm_client.converters import convert_hex_to_int, do_not_convert
 
 class ParsedLog(ParsedObject):
@@ -49,22 +49,20 @@ class LogParserConfig:
         self.log_index_converter = log_index_converter
         self.removed_converter = removed_converter
 
-DEFAULT_LOG_PARSER_CFG = LogParserConfig()
+class LogParser(Parser):
 
-def parse_raw_log(log_dict, parser_cfg=DEFAULT_LOG_PARSER_CFG):
-    return ParsedLog(
-        address=parser_cfg.address_converter(log_dict.get('address')),
-        topics=parser_cfg.topics_converter(log_dict.get('topics')),
-        data=parser_cfg.data_converter(log_dict.get('data')),
-        block_number=parser_cfg.block_number_converter(log_dict.get('blockNumber')),
-        transaction_hash=parser_cfg.transaction_hash_converter(log_dict.get('transactionHash')),
-        transaction_index=parser_cfg.transaction_index_converter(log_dict.get('transactionIndex')),
-        block_hash=parser_cfg.block_hash_converter(log_dict.get('blockHash')),
-        log_index=parser_cfg.log_index_converter(log_dict.get('logIndex')),
-        removed=parser_cfg.removed_converter(log_dict.get('removed'))
-    ).to_dict()
+    def __init__(self, cfg: LogParserConfig=LogParserConfig()):
+        self.cfg = cfg
 
-def parse_raw_logs(log_dict_list, parser_cfg=DEFAULT_LOG_PARSER_CFG):
-    if not log_dict_list:
-        return []
-    return [parse_raw_log(l, parser_cfg=parser_cfg) for l in log_dict_list]
+    def parse(self, log_dict):
+        return ParsedLog(
+            address=self.cfg.address_converter(log_dict.get('address')),
+            topics=self.cfg.topics_converter(log_dict.get('topics')),
+            data=self.cfg.data_converter(log_dict.get('data')),
+            block_number=self.cfg.block_number_converter(log_dict.get('blockNumber')),
+            transaction_hash=self.cfg.transaction_hash_converter(log_dict.get('transactionHash')),
+            transaction_index=self.cfg.transaction_index_converter(log_dict.get('transactionIndex')),
+            block_hash=self.cfg.block_hash_converter(log_dict.get('blockHash')),
+            log_index=self.cfg.log_index_converter(log_dict.get('logIndex')),
+            removed=self.cfg.removed_converter(log_dict.get('removed'))
+        ).to_dict()

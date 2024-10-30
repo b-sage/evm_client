@@ -1,5 +1,5 @@
-from evm_client.parsers.base import ParsedObject
-from evm_client.parsers import parse_raw_transactions, DEFAULT_TRANSACTION_PARSER_CFG
+from evm_client.parsers.base import ParsedObject, Parser
+from evm_client.parsers import TransactionParser
 from evm_client.converters import convert_hex_to_int, do_not_convert, convert_hex_to_datetime
 
 class ParsedBlock(ParsedObject):
@@ -78,8 +78,7 @@ class BlockParserConfig:
             timestamp_converter=convert_hex_to_datetime,
             total_difficulty_converter=convert_hex_to_int,
             #NOTE: must handle for list of transactions, not just single tx
-            transaction_parser=parse_raw_transactions,
-            transaction_parser_config=DEFAULT_TRANSACTION_PARSER_CFG
+            transaction_parser=TransactionParser()
     ):
         self.base_fee_per_gas_converter = base_fee_per_gas_converter
         self.blob_gas_used_converter = blob_gas_used_converter
@@ -103,41 +102,37 @@ class BlockParserConfig:
         self.timestamp_converter = timestamp_converter
         self.total_difficulty_converter = total_difficulty_converter
         self.transaction_parser = transaction_parser
-        self.transaction_parser_config = transaction_parser_config
 
-DEFAULT_BLOCK_PARSER_CFG = BlockParserConfig()
+class BlockParser(Parser):
 
-#TODO: may be missing fields from other networks we'll have to fill as we test through
-def parse_raw_block(block_dict, parser_cfg=DEFAULT_BLOCK_PARSER_CFG):
-    return ParsedBlock(
-        base_fee_per_gas=parser_cfg.base_fee_per_gas_converter(block_dict.get('baseFeePerGas')),
-        blob_gas_used=parser_cfg.blob_gas_used_converter(block_dict.get('blobGasUsed')),
-        difficulty=parser_cfg.difficulty_converter(block_dict.get('difficulty')),
-        excess_blob_gas=parser_cfg.excess_blob_gas_converter(block_dict.get('excessBlobGas')),
-        extra_data=parser_cfg.extra_data_converter(block_dict.get('extraData')),
-        gas_limit=parser_cfg.gas_limit_converter(block_dict.get('gasLimit')),
-        gas_used=parser_cfg.gas_used_converter(block_dict.get('gasUsed')),
-        hash_=parser_cfg.hash_converter(block_dict.get('hash')),
-        logs_bloom=parser_cfg.logs_bloom_converter(block_dict.get('logsBloom')),
-        miner=parser_cfg.miner_converter(block_dict.get('miner')),
-        mix_hash=parser_cfg.mix_hash_converter(block_dict.get('mixHash')),
-        nonce=parser_cfg.nonce_converter(block_dict.get('nonce')),
-        number=parser_cfg.number_converter(block_dict.get('number')),
-        parent_beacon_block_root=parser_cfg.parent_beacon_block_root_converter(block_dict.get('parentBeaconBlockRoot')),
-        parent_hash=parser_cfg.parent_hash_converter(block_dict.get('parentHash')),
-        receipts_root=parser_cfg.receipts_root_converter(block_dict.get('receiptsRoot')),
-        sha3_uncles=parser_cfg.sha3_uncles_converter(block_dict.get('sha3Uncles')),
-        size=parser_cfg.size_converter(block_dict.get('size')),
-        state_root=parser_cfg.state_root_converter(block_dict.get('stateRoot')),
-        timestamp=parser_cfg.timestamp_converter(block_dict.get('timestamp')),
-        total_difficulty=parser_cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
-        #TODO: handle for case where only tx hashes are returned
-        transactions=parser_cfg.transaction_parser(block_dict.get('transactions'), parser_cfg=parser_cfg.transaction_parser_config)
-    ).to_dict()
+    def __init__(self, cfg: BlockParserConfig=BlockParserConfig()):
+        self.cfg = cfg
 
-def parse_raw_blocks(block_dict_list, parser_cfg=DEFAULT_BLOCK_PARSER_CFG):
-    if not block_dict_list:
-        return []
-    return [parse_raw_block(b, parser_cfg=parser_cfg) for b in block_dict_list]
+    def parse(self, block_dict):
+        return ParsedBlock(
+            base_fee_per_gas=self.cfg.base_fee_per_gas_converter(block_dict.get('baseFeePerGas')),
+            blob_gas_used=self.cfg.blob_gas_used_converter(block_dict.get('blobGasUsed')),
+            difficulty=self.cfg.difficulty_converter(block_dict.get('difficulty')),
+            excess_blob_gas=self.cfg.excess_blob_gas_converter(block_dict.get('excessBlobGas')),
+            extra_data=self.cfg.extra_data_converter(block_dict.get('extraData')),
+            gas_limit=self.cfg.gas_limit_converter(block_dict.get('gasLimit')),
+            gas_used=self.cfg.gas_used_converter(block_dict.get('gasUsed')),
+            hash_=self.cfg.hash_converter(block_dict.get('hash')),
+            logs_bloom=self.cfg.logs_bloom_converter(block_dict.get('logsBloom')),
+            miner=self.cfg.miner_converter(block_dict.get('miner')),
+            mix_hash=self.cfg.mix_hash_converter(block_dict.get('mixHash')),
+            nonce=self.cfg.nonce_converter(block_dict.get('nonce')),
+            number=self.cfg.number_converter(block_dict.get('number')),
+            parent_beacon_block_root=self.cfg.parent_beacon_block_root_converter(block_dict.get('parentBeaconBlockRoot')),
+            parent_hash=self.cfg.parent_hash_converter(block_dict.get('parentHash')),
+            receipts_root=self.cfg.receipts_root_converter(block_dict.get('receiptsRoot')),
+            sha3_uncles=self.cfg.sha3_uncles_converter(block_dict.get('sha3Uncles')),
+            size=self.cfg.size_converter(block_dict.get('size')),
+            state_root=self.cfg.state_root_converter(block_dict.get('stateRoot')),
+            timestamp=self.cfg.timestamp_converter(block_dict.get('timestamp')),
+            total_difficulty=self.cfg.total_difficulty_converter(block_dict.get('totalDifficulty')),
+            #TODO: handle for case where only tx hashes are returned
+            transactions=self.cfg.transaction_parser.parse(block_dict.get('transactions'))
+        ).to_dict()
 
 

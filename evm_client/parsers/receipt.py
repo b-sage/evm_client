@@ -1,5 +1,5 @@
 from evm_client.parsers.base import ParsedObject, Parser
-from evm_client.converters import convert_hex_to_int, do_not_convert
+from evm_client.converters import convert_hex_to_int
 from evm_client.parsers import LogParser
 
 class ParsedReceipt(ParsedObject):
@@ -40,20 +40,20 @@ class ReceiptParserConfig:
 
     def __init__(
         self,
-        block_hash_converter=do_not_convert,
-        block_number_converter=convert_hex_to_int,
-        contract_address_converter=do_not_convert,
-        cumulative_gas_used_converter=convert_hex_to_int,
-        effective_gas_price_converter=convert_hex_to_int,
-        from_converter=do_not_convert,
-        gas_used_converter=convert_hex_to_int,
-        log_parser=LogParser(),
-        logs_bloom_converter=do_not_convert,
-        status_converter=convert_hex_to_int,
-        to_converter=do_not_convert,
-        transaction_hash_converter=do_not_convert,
-        transaction_index_converter=convert_hex_to_int,
-        type_converter=convert_hex_to_int
+        block_hash_converter=None,
+        block_number_converter=None,
+        contract_address_converter=None,
+        cumulative_gas_used_converter=None,
+        effective_gas_price_converter=None,
+        from_converter=None,
+        gas_used_converter=None,
+        log_parser=None,
+        logs_bloom_converter=None,
+        status_converter=None,
+        to_converter=None,
+        transaction_hash_converter=None,
+        transaction_index_converter=None,
+        type_converter=None
     ):
         self.block_hash_converter = block_hash_converter
         self.block_number_converter = block_number_converter
@@ -70,26 +70,39 @@ class ReceiptParserConfig:
         self.transaction_index_converter = transaction_index_converter
         self.type_converter = type_converter
 
+    @classmethod
+    def default(cls):
+        return cls(
+            block_number_converter=convert_hex_to_int,
+            cumulative_gas_used_converter=convert_hex_to_int,
+            effective_gas_price_converter=convert_hex_to_int,
+            gas_used_converter=convert_hex_to_int,
+            log_parser=LogParser(),
+            status_converter=convert_hex_to_int,
+            transaction_index_converter=convert_hex_to_int,
+            type_converter=convert_hex_to_int
+        )
+
 class ReceiptParser(Parser):
 
-    def __init__(self, cfg: ReceiptParserConfig=ReceiptParserConfig()):
+    def __init__(self, cfg: ReceiptParserConfig=ReceiptParserConfig.default()):
         self.cfg = cfg
 
     def parse(self, receipt_dict):
         return ParsedReceipt(
-            block_hash=self.cfg.block_hash_converter(receipt_dict.get('blockHash')),
-            block_number=self.cfg.block_number_converter(receipt_dict.get('blockNumber')),
-            contract_address=self.cfg.contract_address_converter(receipt_dict.get('contractAddress')),
-            cumulative_gas_used=self.cfg.cumulative_gas_used_converter(receipt_dict.get('cumulativeGasUsed')),
-            effective_gas_price=self.cfg.effective_gas_price_converter(receipt_dict.get('effectiveGasPrice')),
-            from_=self.cfg.from_converter(receipt_dict.get('from')),
-            gas_used=self.cfg.gas_used_converter(receipt_dict.get('gasUsed')),
-            logs_bloom=self.cfg.logs_bloom_converter(receipt_dict.get('logsBloom')),
+            block_hash=self.apply_converter(self.cfg.block_hash_converter, receipt_dict.get('blockHash')),
+            block_number=self.apply_converter(self.cfg.block_number_converter, receipt_dict.get('blockNumber')),
+            contract_address=self.apply_converter(self.cfg.contract_address_converter, receipt_dict.get('contractAddress')),
+            cumulative_gas_used=self.apply_converter(self.cfg.cumulative_gas_used_converter, receipt_dict.get('cumulativeGasUsed')),
+            effective_gas_price=self.apply_converter(self.cfg.effective_gas_price_converter, receipt_dict.get('effectiveGasPrice')),
+            from_=self.apply_converter(self.cfg.from_converter, receipt_dict.get('from')),
+            gas_used=self.apply_converter(self.cfg.gas_used_converter, receipt_dict.get('gasUsed')),
+            logs_bloom=self.apply_converter(self.cfg.logs_bloom_converter, receipt_dict.get('logsBloom')),
             logs=self.cfg.log_parser.parse_multiple(receipt_dict.get('logs')),
-            status=self.cfg.status_converter(receipt_dict.get('status')),
-            to=self.cfg.to_converter(receipt_dict.get('to')),
-            transaction_hash=self.cfg.transaction_hash_converter(receipt_dict.get('transactionHash')),
-            transaction_index=self.cfg.transaction_index_converter(receipt_dict.get('transactionIndex')),
-            type_=self.cfg.type_converter(receipt_dict.get('type'))
+            status=self.apply_converter(self.cfg.status_converter, receipt_dict.get('status')),
+            to=self.apply_converter(self.cfg.to_converter, receipt_dict.get('to')),
+            transaction_hash=self.apply_converter(self.cfg.transaction_hash_converter, receipt_dict.get('transactionHash')),
+            transaction_index=self.apply_converter(self.cfg.transaction_index_converter, receipt_dict.get('transactionIndex')),
+            type_=self.apply_converter(self.cfg.typ_converter, receipt_dict.get('type'))
         ).to_dict()
 

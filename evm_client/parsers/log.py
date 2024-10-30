@@ -49,20 +49,22 @@ class LogParserConfig:
         self.log_index_converter = log_index_converter
         self.removed_converter = removed_converter
 
-def parse_raw_log(log_dict, log_cfg=LogParserConfig()):
+DEFAULT_LOG_PARSER_CFG = LogParserConfig()
+
+def parse_raw_log(log_dict, parser_cfg=DEFAULT_LOG_PARSER_CFG):
     return ParsedLog(
-        address=log_cfg.address_converter(log_dict.get('address')),
-        topics=log_cfg.topics_converter(log_dict.get('topics')),
-        data=log_cfg.data_converter(log_dict.get('data')),
-        block_number=log_cfg.block_number_converter(log_dict.get('blockNumber')),
-        transaction_hash=log_cfg.transaction_hash_converter(log_dict.get('transactionHash')),
-        transaction_index=log_cfg.transaction_index_converter(log_dict.get('transactionIndex')),
-        block_hash=log_cfg.block_hash_converter(log_dict.get('blockHash')),
-        log_index=log_cfg.log_index_converter(log_dict.get('logIndex')),
-        removed=log_cfg.removed_converter(log_dict.get('removed'))
+        address=parser_cfg.address_converter(log_dict.get('address')),
+        topics=parser_cfg.topics_converter(log_dict.get('topics')),
+        data=parser_cfg.data_converter(log_dict.get('data')),
+        block_number=parser_cfg.block_number_converter(log_dict.get('blockNumber')),
+        transaction_hash=parser_cfg.transaction_hash_converter(log_dict.get('transactionHash')),
+        transaction_index=parser_cfg.transaction_index_converter(log_dict.get('transactionIndex')),
+        block_hash=parser_cfg.block_hash_converter(log_dict.get('blockHash')),
+        log_index=parser_cfg.log_index_converter(log_dict.get('logIndex')),
+        removed=parser_cfg.removed_converter(log_dict.get('removed'))
     ).to_dict()
 
-def parse_raw_logs(log_dict_list, log_cfg=LogParserConfig()):
+def parse_raw_logs(log_dict_list, parser_cfg=DEFAULT_LOG_PARSER_CFG):
     if not log_dict_list:
         return []
-    return [parse_raw_log(l, log_cfg=log_cfg) for l in log_dict_list]
+    return [parse_raw_log(l, parser_cfg=parser_cfg) for l in log_dict_list]

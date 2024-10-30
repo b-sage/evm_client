@@ -1,4 +1,4 @@
-from .transaction import parse_raw_transaction, parse_raw_transactions
-from .block import parse_raw_block, parse_raw_blocks
-from .receipt import parse_raw_log, parse_raw_receipt, parse_raw_logs, parse_raw_receipts
-from .hex_to_int import parse_raw_hex_to_int
+from evm_client.parsers.transaction import parse_raw_transaction, parse_raw_transactions, TransactionParserConfig, DEFAULT_TRANSACTION_PARSER_CFG
+from evm_client.parsers.block import parse_raw_block, parse_raw_blocks, BlockParserConfig, DEFAULT_BLOCK_PARSER_CFG
+from evm_client.parsers.log import parse_raw_log, parse_raw_logs, LogParserConfig, DEFAULT_LOG_PARSER_CFG
+from evm_client.parsers.receipt import parse_raw_receipt, parse_raw_receipts, ReceiptParserConfig, DEFAULT_RECEIPT_PARSER_CFG

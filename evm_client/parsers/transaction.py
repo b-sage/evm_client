@@ -89,32 +89,34 @@ class TransactionParserConfig:
         self.max_priority_fee_per_gas_converter = max_priority_fee_per_gas_converter
         self.chain_id_converter = chain_id_converter
 
+DEFAULT_TRANSACTION_PARSER_CFG = TransactionParserConfig()
+
 #TODO: may be some fields we need to add as we test through networks
-def parse_raw_transaction(transaction_dict, tx_cfg=TransactionParserConfig()):
+def parse_raw_transaction(transaction_dict, parser_cfg=DEFAULT_TRANSACTION_PARSER_CFG):
     return ParsedTransaction(
-        block_hash=tx_cfg.block_hash_converter(transaction_dict.get('blockHash')),
-        block_number=tx_cfg.block_number_converter(transaction_dict.get('blockNumber')),
-        from_=tx_cfg.from_converter(transaction_dict.get('from')),
-        gas=tx_cfg.gas_converter(transaction_dict.get('gas')),
-        gas_price=tx_cfg.gas_price_converter(transaction_dict.get('gasPrice')),
-        hash_=tx_cfg.hash_converter(transaction_dict.get('hash')),
-        input_=tx_cfg.input_converter(transaction_dict.get('input')),
-        nonce=tx_cfg.nonce_converter(transaction_dict.get('nonce')),
-        r=tx_cfg.r_converter(transaction_dict.get('r')),
-        s=tx_cfg.s_converter(transaction_dict.get('s')),
-        to=tx_cfg.to_converter(transaction_dict.get('to')),
-        transaction_index=tx_cfg.transaction_index_converter(transaction_dict.get('transactionIndex')),
-        type_=tx_cfg.type_converter(transaction_dict.get('type')),
-        v=tx_cfg.v_converter(transaction_dict.get('v')),
-        value=tx_cfg.value_converter(transaction_dict.get('value')),
-        access_list=tx_cfg.access_list_converter(transaction_dict.get('accessList')),
-        max_fee_per_gas=tx_cfg.max_fee_per_gas_converter(transaction_dict.get('maxFeePerGas')),
-        max_priority_fee_per_gas=tx_cfg.max_priority_fee_per_gas_converter(transaction_dict.get('maxPriorityFeePerGas')),
-        chain_id=tx_cfg.chain_id_converter(transaction_dict.get('chainId'))
+        block_hash=parser_cfg.block_hash_converter(transaction_dict.get('blockHash')),
+        block_number=parser_cfg.block_number_converter(transaction_dict.get('blockNumber')),
+        from_=parser_cfg.from_converter(transaction_dict.get('from')),
+        gas=parser_cfg.gas_converter(transaction_dict.get('gas')),
+        gas_price=parser_cfg.gas_price_converter(transaction_dict.get('gasPrice')),
+        hash_=parser_cfg.hash_converter(transaction_dict.get('hash')),
+        input_=parser_cfg.input_converter(transaction_dict.get('input')),
+        nonce=parser_cfg.nonce_converter(transaction_dict.get('nonce')),
+        r=parser_cfg.r_converter(transaction_dict.get('r')),
+        s=parser_cfg.s_converter(transaction_dict.get('s')),
+        to=parser_cfg.to_converter(transaction_dict.get('to')),
+        transaction_index=parser_cfg.transaction_index_converter(transaction_dict.get('transactionIndex')),
+        type_=parser_cfg.type_converter(transaction_dict.get('type')),
+        v=parser_cfg.v_converter(transaction_dict.get('v')),
+        value=parser_cfg.value_converter(transaction_dict.get('value')),
+        access_list=parser_cfg.access_list_converter(transaction_dict.get('accessList')),
+        max_fee_per_gas=parser_cfg.max_fee_per_gas_converter(transaction_dict.get('maxFeePerGas')),
+        max_priority_fee_per_gas=parser_cfg.max_priority_fee_per_gas_converter(transaction_dict.get('maxPriorityFeePerGas')),
+        chain_id=parser_cfg.chain_id_converter(transaction_dict.get('chainId'))
     ).to_dict()
 
-def parse_raw_transactions(transaction_dict_list, tx_cfg=TransactionParserConfig()):
+def parse_raw_transactions(transaction_dict_list, parser_cfg=DEFAULT_TRANSACTION_PARSER_CFG):
     if not transaction_dict_list:
         return []
-    return [parse_raw_transaction(t, tx_cfg=tx_cfg) for t in transaction_dict_list]
+    return [parse_raw_transaction(t, parser_cfg=parser_cfg) for t in transaction_dict_list]
 

@@ -14,8 +14,10 @@ class MethodInfo:
         self.output_types = [o['type'] for o in self.outputs]
         self.payable = payable
         self.state_mutability = state_mutability
-        self._hasher = _hasher or Keccak256(CryptodomeBackend())
-        self.selector = self.get_selector()
+        self.signature = "{}({})".format(self.name, ",".join(self.input_types))
+        
+        _hasher = _hasher or Keccak256(CryptodomeBackend())
+        self.selector = '0x' + HexBytes(_hasher(self.signature.encode('utf-8')))[0:4].hex()
 
     @classmethod
     def from_abi_part(cls, part, _hasher=None):
@@ -28,18 +30,9 @@ class MethodInfo:
             _hasher=_hasher
         )
 
-    def _build_signature(self):
-        return "{}({})".format(self.name, ",".join(self.input_types))
-
-    def _build_selector(self, signature):
-        return HexBytes(self._hasher(signature.encode('utf-8')))[0:4].hex()
-
-    def get_selector(self):
-        sig = self._build_signature()
-        return '0x' + self._build_selector(sig)
-
-    def __call__(self, *args):
-        assert len(args) == len(self.inputs), "msimatched between expected inputs length and actual inputs length"
+    def encode_args(self, *args):
+        #TODO: better input validation
+        assert len(args) == len(self.inputs), "msimatch between expected inputs length and actual inputs length"
         if self.inputs:
             return HexBytes(encode(self.input_types, args)).hex()
         return ''
@@ -57,12 +50,12 @@ class Method:
 
     def __init__(self, address, abi_part, _hasher=None):
         self.address = address
-        self.method_info = MethodInfo.from_abi_part(abi_part, _hasher)
+        self.info = MethodInfo.from_abi_part(abi_part, _hasher)
         self.selector = self.method_info.selector
 
     def __call__(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
         return Transaction(
-            self.selector + self.method_info(*args),
+            self.selector + self.info.encode_args(*args),
             to=self.address,
             from_=from_,
             gas=gas,
@@ -71,8 +64,9 @@ class Method:
             nonce=nonce
         )
 
+    #TODO: bit weird that the info attribute is doing the decoding here. 
     def decode_result(self, result):
-        return self.method_info.decode_result(result)
+        return self.info.decode_result(result)
 
 
 class Methods:

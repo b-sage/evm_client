@@ -4,6 +4,7 @@ from eth_hash import Keccak256
 from eth_hash.backends.pycryptodome import CryptodomeBackend
 from evm_client.types import Transaction
 
+#not sure whether this is better named encoder or info. Accessing the info attributes may be useful
 class MethodInfo:
 
     def __init__(self, name, inputs, outputs, payable, state_mutability, _hasher=None):
@@ -45,17 +46,20 @@ class MethodInfo:
             return decoded[0]
         return [item for item in decoded]
 
+    def decode_results(self, results):
+        return [self.decode_result(r) for r in results]
+
 
 class Method:
 
     def __init__(self, address, abi_part, _hasher=None):
         self.address = address
         self.info = MethodInfo.from_abi_part(abi_part, _hasher)
-        self.selector = self.method_info.selector
+        self.selector = self.info.selector
 
-    def __call__(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
+    def build_transaction(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
         return Transaction(
-            self.selector + self.info.encode_args(*args),
+            self.selector + self.encode_args(*args),
             to=self.address,
             from_=from_,
             gas=gas,
@@ -64,9 +68,15 @@ class Method:
             nonce=nonce
         )
 
+    def encode_args(self, *args):
+        return self.info.encode_args(*args)
+
     #TODO: bit weird that the info attribute is doing the decoding here. 
     def decode_result(self, result):
         return self.info.decode_result(result)
+
+    def decode_results(self, results):
+        return self.info.decode_results(results)
 
 
 class Methods:

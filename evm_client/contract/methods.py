@@ -38,8 +38,10 @@ class MethodInfo:
             return HexBytes(encode(self.input_types, args)).hex()
         return ''
 
-    #NOTE: unless we use the client directly in the contract object the user will have to do the decoding
-    #I do not like the idea of using client directly here, as it limits the potential of batch requesting
+    #NOTE: unless we use the client directly in the contract object the user will have to do the decoding. Fortunately,
+    #this is actually pretty simple as we can just have the user pass the "decode_result/decode_results" method to the desired
+    #client method as a 'decoder' arg, E.x. 
+    #client.call(contract.functions.balanceOf.build_transaction('0x....'), decoder=contract.functions.balanceOf.decode_result)
     def decode_result(self, result):
         decoded = decode(self.output_types, HexBytes(result))
         if len(decoded) == 1:

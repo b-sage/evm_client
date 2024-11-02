@@ -54,7 +54,7 @@ def test_decimals(client, contract):
 
 def test_get_logs(client, contract, n):
     logs = client.get_logs(
-        contract.events.Transfer.get_filter(from_block=n-100, to_block=n),
+        contract.events.Transfer.build_filter(from_block=n-100, to_block=n),
         decoder=contract.events.Transfer.decode_results
     )
     assert type(logs) == list

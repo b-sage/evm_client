@@ -62,7 +62,7 @@ class Event:
         self.hash = self.info.hash
 
     #NOTE: currently does not support adding additional topics. Users can append to EthFilter.topics as needed
-    def get_filter(self, from_block=None, to_block=None, block_hash=None):
+    def build_filter(self, from_block=None, to_block=None, block_hash=None):
         return EthFilter(
             address=self.address,
             from_block=from_block,

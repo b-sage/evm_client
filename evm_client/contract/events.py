@@ -4,22 +4,19 @@ from eth_hash.backends.pycryptodome import CryptodomeBackend
 from eth_abi import decode
 from evm_client.types import EthFilter
 
-class EventInfo:
+class Event:
 
-    def __init__(self, anonymous, inputs, name, _hasher=None):
+    def __init__(self, address, anonymous, inputs, name, _hasher=None):
+        self.address = address
         self.anonymous = anonymous
         self.inputs = inputs
         self.name = name
        
-        self.input_types = []
-        self.indexed_inputs = []
-        self.unindexed_inputs = []
-        for i in self.inputs:
-            self.input_types.append(i['type'])
-            if i['indexed']:
-                self.indexed_inputs.append(i)
-            else:
-                self.unindexed_inputs.append(i)
+        #TODO: lot of list comps over the same lists here... should probably test efficieny but I think this looks nicer
+        self.input_types = [i['type'] for i in self.inputs]
+        self.indexed_inputs = [i for i in self.inputs if i['indexed']]
+        self.unindexed_inputs = [i for i in self.inputs if not i['indexed']]
+        
         self.signature = "{}({})".format(self.name, ",".join(self.input_types))
         self.unindexed_types = [u['type'] for u in self.unindexed_inputs]
         self.unindexed_names = [u['name'] for u in self.unindexed_inputs]
@@ -30,12 +27,23 @@ class EventInfo:
         self.hash = '0x' + HexBytes(_hasher(self.signature.encode('utf-8'))).hex() 
 
     @classmethod
-    def from_abi_part(cls, part, _hasher=None):
+    def from_abi_part(cls, part, address, _hasher=None):
         return cls(
+            address,
             part['anonymous'],
             part['inputs'],
             part['name'],
             _hasher=_hasher
+        )
+
+    #NOTE: currently does not support adding additional topics. Users can append to EthFilter.topics as needed
+    def build_filter(self, from_block=None, to_block=None, block_hash=None):
+        return EthFilter(
+            address=self.address,
+            from_block=from_block,
+            to_block=to_block,
+            topics=[self.hash],
+            block_hash=block_hash
         )
     
     #TY Banteg for the idea: https://codeburst.io/deep-dive-into-ethereum-logs-a8d2047c7371
@@ -54,33 +62,15 @@ class EventInfo:
         return [self.decode_result(r) for r in results]
 
 
-class Event:
-
-    def __init__(self, address, abi_part, _hasher=None):
-        self.address = address
-        self.info = EventInfo.from_abi_part(abi_part, _hasher=_hasher)
-        self.hash = self.info.hash
-
-    #NOTE: currently does not support adding additional topics. Users can append to EthFilter.topics as needed
-    def build_filter(self, from_block=None, to_block=None, block_hash=None):
-        return EthFilter(
-            address=self.address,
-            from_block=from_block,
-            to_block=to_block,
-            topics=[self.info.hash],
-            block_hash=block_hash
-        )
-    
-    def decode_result(self, result):
-        return self.info.decode_result(result)
-
-    def decode_results(self, results):
-        return self.info.decode_results(results)
-
-
 class Events:
     
-    def build_events(self, address, events, _hasher=None):
+    def __init__(self, address, events, _hasher=None):
         _hasher = _hasher or Keccak256(CryptodomeBackend())
+        _events = []
         for event in events:
-            setattr(self, event['name'], Event(address, event, _hasher=_hasher))
+            e = Event.from_abi_part(event, address, _hasher=_hasher)
+            setattr(self, event['name'], e)
+            _events.append(e)
+        self.signatures = [e.signature for e in _events]
+        self.hashes = [e.hash for e in _events]
+        self.signature_hash_map = dict(zip(self.signatures, self.hashes))

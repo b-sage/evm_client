@@ -4,31 +4,44 @@ from eth_hash import Keccak256
 from eth_hash.backends.pycryptodome import CryptodomeBackend
 from evm_client.types import Transaction
 
-#not sure whether this is better named encoder or info. Accessing the info attributes may be useful
-class MethodInfo:
+class Method:
 
-    def __init__(self, name, inputs, outputs, payable, state_mutability, _hasher=None):
+    def __init__(self, address, name, inputs, outputs, payable, state_mutability, _hasher=None):
+        self.address = address
         self.name = name
         self.inputs = inputs
-        self.input_types = [i['type'] for i in self.inputs]
         self.outputs = outputs
-        self.output_types = [o['type'] for o in self.outputs]
         self.payable = payable
         self.state_mutability = state_mutability
-        self.signature = "{}({})".format(self.name, ",".join(self.input_types))
         
-        _hasher = _hasher or Keccak256(CryptodomeBackend())
-        self.selector = '0x' + HexBytes(_hasher(self.signature.encode('utf-8')))[0:4].hex()
+        self.input_types = [i['type'] for i in self.inputs] 
+        self.output_types = [o['type'] for o in self.outputs]
+        self.signature = "{}({})".format(self.name, ",".join(self.input_types))
+
+        _hasher = _hasher = Keccak256(CryptodomeBackend())
+        self.selector = '0x' + HexBytes(_hasher(self.signature.encode('utf-8')))[0:4].hex() 
 
     @classmethod
-    def from_abi_part(cls, part, _hasher=None):
+    def from_abi_part(cls, part, address, _hasher=None):
         return cls(
+            address,
             part['name'],
             part['inputs'],
             part['outputs'],
-            part['payable'],
+            part.get('payable'),
             part['stateMutability'],
             _hasher=_hasher
+        )
+
+    def build_transaction(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
+        return Transaction(
+            self.selector + self.encode_args(*args),
+            to=self.address,
+            from_=from_,
+            gas=gas,
+            gas_price=gas_price,
+            value=value,
+            nonce=nonce
         )
 
     def encode_args(self, *args):
@@ -52,40 +65,19 @@ class MethodInfo:
         return [self.decode_result(r) for r in results]
 
 
-class Method:
-
-    def __init__(self, address, abi_part, _hasher=None):
-        self.address = address
-        self.info = MethodInfo.from_abi_part(abi_part, _hasher)
-        self.selector = self.info.selector
-
-    def build_transaction(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
-        return Transaction(
-            self.selector + self.encode_args(*args),
-            to=self.address,
-            from_=from_,
-            gas=gas,
-            gas_price=gas_price,
-            value=value,
-            nonce=nonce
-        )
-
-    def encode_args(self, *args):
-        return self.info.encode_args(*args)
-
-    #TODO: bit weird that the info attribute is doing the decoding here. 
-    def decode_result(self, result):
-        return self.info.decode_result(result)
-
-    def decode_results(self, results):
-        return self.info.decode_results(results)
-
-
 class Methods:
 
-    def build_methods(self, address, functions, _hasher=None):
+    #should we make methods accessible by ['']?
+    def __init__(self, address, functions, _hasher=None):
         #just save a bit of time instantiating one hasher for all methods vs one per method
         _hasher = _hasher or Keccak256(CryptodomeBackend())
+        methods = []
         for function in functions:
-            setattr(self, function['name'], Method(address, function, _hasher))
+            method = Method.from_abi_part(function, address, _hasher=_hasher)
+            #TODO: overloaded functions break, Vyper contracts namely. not sure of any work around other than appending the name somehow
+            setattr(self, function['name'], method)
+            methods.append(method)
+        self.signatures = [m.signature for m in methods]
+        self.selectors = [m.selector for m in methods]
+        self.signature_selector_map = dict(zip(self.signatures, self.selectors))
 

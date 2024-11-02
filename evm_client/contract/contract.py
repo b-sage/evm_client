@@ -12,7 +12,6 @@ class Contract:
         self._events = [part for part in abi if part['type'] == 'event']
         
         _hasher = Keccak256(CryptodomeBackend())
-        self.functions = Methods()
-        self.functions.build_methods(self.address, self._functions, _hasher)
-        self.events = Events()
-        self.events.build_events(self.address, self._events, _hasher)
+        self.functions = Methods(self.address, self._functions, _hasher)
+        self.events = Events(self.address, self._events, _hasher)
+

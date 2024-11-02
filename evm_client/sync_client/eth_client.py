@@ -135,10 +135,11 @@ class SyncEthClient(SyncClientCore, EthCore):
         res = self.make_post_request(body)
         return process_http_response(res)
 
-    def call(self, transaction: Transaction, block_number: Union[int, str]="latest", request_id: int=1):
+    def call(self, transaction: Transaction, decoder=None, block_number: Union[int, str]="latest", request_id: int=1):
         body = self.get_eth_call_body(transaction, block_number=block_number, request_id=request_id)
         res = self.make_post_request(body)
-        return process_http_response(res)
+        result = process_http_response(res)
+        return result if not decoder else decoder(result)
 
     def estimate_gas(self, transaction: Transaction, request_id: int=1):
         body = self.get_eth_estimate_gas_body(transaction, request_id=request_id)
@@ -221,11 +222,12 @@ class SyncEthClient(SyncClientCore, EthCore):
         res = self.make_post_request(body)
         return parser.parse_multiple(process_http_response(res))
 
-    def get_logs(self, filter_: EthFilter, request_id: int=1, parser=None):
+    def get_logs(self, filter_: EthFilter, request_id: int=1, parser=None, decoder=None):
         parser = parser or self.default_log_parser
         body = self.get_eth_get_logs_body(filter_, request_id=request_id)
         res = self.make_post_request(body)
-        return parser.parse_multiple(process_http_response(res))
+        parsed = parser.parse_multiple(process_http_response(res))
+        return decoder(parsed) if decoder else parsed
 
     def get_account(self, address: str, block_number: Union[int, str]="latest", request_id: int=1):
         body = self.get_eth_get_account_body(address, block_number, request_id=request_id)

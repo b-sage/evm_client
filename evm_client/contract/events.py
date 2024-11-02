@@ -71,12 +71,8 @@ class Event:
             block_hash=block_hash
         )
     
-    def decode_result(self, result):
-        return self.info.decode_result(result)
-
     def decode_results(self, results):
         return self.info.decode_results(results)
-
 
 
 class Events:

@@ -21,6 +21,10 @@ class EventInfo:
             else:
                 self.unindexed_inputs.append(i)
         self.signature = "{}({})".format(self.name, ",".join(self.input_types))
+        self.unindexed_types = [u['type'] for u in self.unindexed_inputs]
+        self.unindexed_names = [u['name'] for u in self.unindexed_inputs]
+        self.indexed_types = [i['type'] for i in self.indexed_inputs]
+        self.indexed_names = [i['name'] for i in self.indexed_inputs]
 
         _hasher = _hasher or Keccak256(CryptodomeBackend())
         self.hash = '0x' + HexBytes(_hasher(self.signature.encode('utf-8'))).hex() 
@@ -33,17 +37,14 @@ class EventInfo:
             part['name'],
             _hasher=_hasher
         )
-
+    
+    #TY Banteg for the idea: https://codeburst.io/deep-dive-into-ethereum-logs-a8d2047c7371
     def decode_result(self, result):
-        unindexed_types = [u['type'] for u in self.unindexed_inputs]
-        unindexed_names = [u['name'] for u in self.unindexed_inputs]
-        unindexed_values = decode(unindexed_types, HexBytes(result['data']))
-        unindexed_map = dict(zip(unindexed_names, unindexed_values))
+        unindexed_values = decode(self.unindexed_types, HexBytes(result['data']))
+        unindexed_map = dict(zip(self.unindexed_names, unindexed_values))
 
-        indexed_types = [i['type'] for i in self.indexed_inputs]
-        indexed_names = [i['name'] for i in self.indexed_inputs]
-        indexed_values = [decode([t], HexBytes(v))[0] for t, v in zip(indexed_types, result['topics'][1:])]
-        indexed_map = dict(zip(indexed_names, indexed_values))
+        indexed_values = [decode([t], HexBytes(v))[0] for t, v in zip(self.indexed_types, result['topics'][1:])]
+        indexed_map = dict(zip(self.indexed_names, indexed_values))
         
         res = {k: v for k, v in result.items() if k not in ['topics', 'data']}
         res['data'] = {**indexed_map, **unindexed_map}

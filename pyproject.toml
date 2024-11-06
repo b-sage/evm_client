@@ -1,6 +1,6 @@
 [build-system]
-dynamic = ["dependencies"]
 requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
@@ -13,3 +13,5 @@ authors = [{name = "Ben Sage"}]
 maintainers = [{name = "Ben Sage"}]
 readme = "README.md"
 keywords = ["crypto", "web3", "ethereum", "blockchain", "evm_client"]
+dynamic = ["dependencies"]
+

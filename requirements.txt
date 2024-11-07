@@ -5,7 +5,6 @@ eth-hash==0.7.0
 eth-typing==5.0.1
 eth-utils==5.1.0
 eth_abi==5.1.0
-git+ssh://git@github.com/b-sage/evm_client.git@7ed5754fd3a5960d71ea2773f27267a2427dcffb#egg=evm_client
 exceptiongroup==1.2.2
 hexbytes==1.2.1
 idna==3.10

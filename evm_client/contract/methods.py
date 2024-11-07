@@ -13,14 +13,35 @@ class Method:
         self.outputs = outputs
         self.payable = payable
         self.state_mutability = state_mutability
-        
-        self.input_types = [i['type'] for i in self.inputs] 
-        self.output_types = [o['type'] for o in self.outputs]
+       
+        self.input_types = self._build_types(self.inputs)
+        self.output_types = self._build_types(self.outputs)
         self.signature = "{}({})".format(self.name, ",".join(self.input_types))
 
         _hasher = _hasher = Keccak256(CryptodomeBackend())
         self.selector = '0x' + HexBytes(_hasher(self.signature.encode('utf-8')))[0:4].hex() 
+   
+    def _build_type_from_component(self, part):
+        result = ''
+        if part.get('components'):
+            for component in part['components']:
+                result += '{},'.format(self._build_type_from_component(component))
+            result = result.rstrip(',')
+            result = '(' + result + ')'
+        else:
+            result += '{},'.format(part['type'])
+        result = result.rstrip(',')
+        return result
 
+    def _build_types(self, io):
+        types_ = []
+        for part in io:
+            if part.get('components') is None:
+                types_.append(part['type'])
+            else:
+                types_.append(self._build_type_from_component(part))
+        return types_
+ 
     @classmethod
     def from_abi_part(cls, part, address, _hasher=None):
         return cls(

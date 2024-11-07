@@ -18,7 +18,7 @@ class Method:
         self.output_types = self._build_types(self.outputs)
         self.signature = "{}({})".format(self.name, ",".join(self.input_types))
 
-        _hasher = _hasher = Keccak256(CryptodomeBackend())
+        _hasher = _hasher or Keccak256(CryptodomeBackend())
         self.selector = '0x' + HexBytes(_hasher(self.signature.encode('utf-8')))[0:4].hex() 
    
     def _build_type_from_component(self, part):

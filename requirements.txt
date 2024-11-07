@@ -1,1 +1,23 @@
-requests
+certifi==2024.8.30
+charset-normalizer==3.4.0
+cytoolz==1.0.0
+eth-hash==0.7.0
+eth-typing==5.0.1
+eth-utils==5.1.0
+eth_abi==5.1.0
+-e git+ssh://git@github.com/b-sage/evm_client.git@7ed5754fd3a5960d71ea2773f27267a2427dcffb#egg=evm_client
+exceptiongroup==1.2.2
+hexbytes==1.2.1
+idna==3.10
+iniconfig==2.0.0
+packaging==24.1
+parsimonious==0.10.0
+pluggy==1.5.0
+pycryptodome==3.21.0
+pytest==8.3.3
+regex==2024.9.11
+requests==2.32.3
+tomli==2.0.2
+toolz==1.0.0
+typing_extensions==4.12.2
+urllib3==2.2.3

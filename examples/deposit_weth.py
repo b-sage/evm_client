@@ -3,7 +3,7 @@ from evm_client.sync_client import SyncEthClient
 from evm_client.contract import Contract
 from eth_account import Account
 
-def create_weth_deposit_tx(client, weth_contract, account, amount, gas=1000000):
+def create_weth_deposit_tx(client, weth_contract, account, amount=(10**18), gas=1000000):
     return weth_contract.functions.deposit.build_transaction(
         from_=acct.address,
         value=amount,
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     weth = Contract(WETH_ADDRESS, WETH_ABI)
     acct = Account.from_key(ACCT_PK)
 
-    weth_deposit = create_weth_deposit_tx(client, weth, acct, (10 ** 18))
+    weth_deposit = create_weth_deposit_tx(client, weth, acct)
     signed = acct.sign_transaction(weth_deposit.to_json())
     tx_hash = client.send_raw_transaction(signed.raw_transaction.hex())
     print(tx_hash)

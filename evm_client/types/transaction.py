@@ -36,6 +36,8 @@ class Transaction:
         for k, v in self.json.items():
             if type(v) == int:
                 v = str(hex(v))
+            elif type(v) == float:
+                v = str(hex(int(v)))
             if v is not None:
                 json[k] = v
         return json

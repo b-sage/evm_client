@@ -53,7 +53,7 @@ def block_hashes(blocks):
 def transaction_hashes(block):
     return [tx['hash'] for tx in block['transactions']]
 
-def test_batch_get_logs(client, transfer_filter, transfer_decoder, block_numbers):
+def test_batch_get_logs(client, transfer_filter, block_numbers):
     chunked = chunks(block_numbers, 100)
     filters = []
     for c in chunked:

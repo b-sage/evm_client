@@ -13,7 +13,7 @@ class BatchEthClient(BatchClientCore, EthCore):
             node_url,
             block_parser=BlockParser(),
             log_parser=LogParser(),
-            transaction_parser=TransasctionParser()
+            transaction_parser=TransactionParser()
     ):
         super().__init__(node_url)
         self.default_block_parser = block_parser

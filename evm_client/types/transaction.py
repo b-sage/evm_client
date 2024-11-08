@@ -27,7 +27,8 @@ class Transaction:
             "gas": self.gas,
             "gasPrice": self.gas_price,
             "data": self.input_,
-            "nonce": self.nonce
+            "nonce": self.nonce,
+            "value": self.value
         }
 
     def to_json(self):

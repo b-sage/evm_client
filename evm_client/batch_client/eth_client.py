@@ -1,7 +1,8 @@
 import time
-from typing import List, Union
+from typing import List, Union, Tuple
 from evm_client.batch_client.client_core import BatchClientCore
 from evm_client.core.eth_core import EthCore
+from evm_client.converters import convert_hex_to_int
 from evm_client.types import EthFilter, Transaction
 from evm_client.batch_client.utils import chunks
 from evm_client.parsers import BlockParser, LogParser, TransactionParser
@@ -69,4 +70,19 @@ class BatchEthClient(BatchClientCore, EthCore):
             req_id += 1
         result_generator = self.make_batch_request(bodies, req_inc)
         return self.yield_dict_result(result_generator, parser)
+
+    # addrs_and_blocks: [('0xabc123...', 'latest'), ('0xdef456...', 1772397)]
+    def get_balance_batch(self, addrs_and_blocks: List[Tuple[str, Union[int, str]]], req_inc: int=100):
+        req_id = 1
+        bodies = []
+        req_map = {}
+        for address, block_num in addrs_and_blocks:
+            bodies.append(self.get_eth_get_balance_body(address, block_number=block_num, request_id=req_id))
+            req_map[req_id] = (address, block_num)
+            req_id += 1
+        result_generator = self.make_batch_request(bodies, req_inc)
+        for r in result_generator:
+            yield {req_map[k]: convert_hex_to_int(v) for k, v in r.items()}
+
+
 

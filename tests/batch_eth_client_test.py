@@ -6,11 +6,11 @@ from evm_client.sync_client.eth_client import SyncEthClient
 from evm_client.batch_client.utils import chunks
 from evm_client.types import EthFilter
 from evm_client.contract import Contract
-from constants import ETH_USDC, ERC20_ABI
+from constants import ETH_USDC, ERC20_ABI, RPC_URL
 
 @pytest.fixture(scope="session")
 def rpc_url():
-    return "https://eth.llamarpc.com"#os.getenv("ETH_RPC_URL")
+    return os.getenv("ETH_RPC_URL") if os.getenv("ETH_RPC_URL") else RPC_URL
 
 @pytest.fixture(scope="session")
 def client(rpc_url):
@@ -74,3 +74,8 @@ def test_batch_get_blocks_by_hashes(client, block_hashes):
 def test_batch_get_transactions(client, transaction_hashes):
     transactions = client.get_transaction_batch(transaction_hashes)
     assert isinstance(transactions, GeneratorType)
+
+def test_batch_get_balance(client, usdc, block_numbers):
+    reqs = [(usdc.address, n) for n in block_numbers]
+    balances = client.get_balance_batch(reqs)
+    assert isinstance(balances, GeneratorType)

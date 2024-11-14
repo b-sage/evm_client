@@ -71,4 +71,3 @@ class BatchClientCore(SyncClientCore):
             for request_id, data in response.items():
                 yield(request_id, data)
 
-

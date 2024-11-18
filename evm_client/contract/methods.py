@@ -56,7 +56,7 @@ class Method:
 
     def build_transaction(self, *args, from_=None, gas=None, gas_price=None, value=None, nonce=None):
         return Transaction(
-            self.selector + self.encode_args(*args),
+            self.build_calldata(*args),
             to=self.address,
             from_=from_,
             gas=gas,
@@ -71,6 +71,9 @@ class Method:
         if self.inputs:
             return HexBytes(encode(self.input_types, args)).hex()
         return ''
+
+    def build_calldata(self, *args):
+        return self.selector + self.encode_args(*args)
 
     #NOTE: unless we use the client directly in the contract object the user will have to do the decoding. Fortunately,
     #this is actually pretty simple as we can just have the user pass the "decode_result/decode_results" method to the desired

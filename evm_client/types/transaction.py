@@ -1,6 +1,5 @@
 from typing import Optional
-
-#TODO: think we need both SignedTransaction and UnsignedTransaction types
+from eth_account import Account
 
 class Transaction:
 
@@ -30,6 +29,11 @@ class Transaction:
             "nonce": self.nonce,
             "value": self.value
         }
+
+    def sign(self, private_key: str):
+        json = self.to_json()
+        acct = Account.from_key(private_key)
+        return acct.sign_transaction(json)
 
     def to_json(self):
         json = {}

@@ -84,5 +84,14 @@ class BatchEthClient(BatchClientCore, EthCore):
         for r in result_generator:
             yield {req_map[k]: convert_hex_to_int(v) for k, v in r.items()}
 
-
-
+    def get_transaction_count_batch(self, addrs_and_blocks: List[Tuple[str, Union[int, str]]], req_inc: int=100):
+        req_id = 1
+        bodies = []
+        req_map = {}
+        for address, block_num in addrs_and_blocks:
+            bodies.append(self.get_eth_get_transaction_count_body(address, block_number=block_num, request_id=req_id))
+            req_map[req_id] = (address, block_num)
+            req_id += 1
+        result_generator = self.make_batch_request(bodies, req_inc)
+        for r in result_generator:
+            yield {req_map[k]: convert_hex_to_int(v) for k, v in r.items()}
